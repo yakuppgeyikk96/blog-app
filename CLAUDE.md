@@ -87,6 +87,23 @@ Auth guards are implemented as `preHandler` hooks in `apps/api/src/common/guards
 - Create blog posts
 - List and view blog posts
 
+## Core Principles
+
+- **Design docs are the source of truth** — `docs/` altındaki dokümanlar plan veya prompt ile çelişirse, doküman kazanır.
+- **Clean code** — `.claude/skills/clean-code/SKILL.md` tüm kod yazma ve review işlemlerinde geçerlidir.
+- **Read before implement** — Bir feature'a başlamadan önce ilgili `docs/` dosyalarını oku.
+
+## Design Documents
+
+Detailed design decisions live in `docs/`. **Before implementing any feature, read the relevant docs first.** The design documents are the source of truth — if a plan or prompt conflicts with a doc, follow the doc.
+
+| Document              | Covers                                        |
+| --------------------- | --------------------------------------------- |
+| `docs/auth.md`        | JWT payload, password hashing, cookie config, auth guard |
+| `docs/data-flow.md`   | Entity vs DTO, shared-types package, mappers  |
+| `docs/architecture.md`| Layered architecture, module structure        |
+| `docs/tech-stack.md`  | Technology choices and rationale              |
+
 ## Development
 
 ```bash
