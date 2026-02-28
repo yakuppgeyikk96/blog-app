@@ -1,0 +1,14 @@
+node_modules
+dist
+.next
+out
+build
+.turbo
+.git
+.gitignore
+.env*.local
+*.md
+.DS_Store
+coverage
+.vscode
+.claude
