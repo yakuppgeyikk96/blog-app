@@ -28,6 +28,59 @@ packages/
 | Monorepo       | Turborepo + pnpm        |
 | Language       | TypeScript              |
 
+## Backend Architecture
+
+The API follows a **layered architecture** organized by feature modules.
+
+### Request Flow
+
+```
+Request → Route → Handler → Service → Repository → Database
+```
+
+| Layer        | Responsibility                                                              |
+| ------------ | --------------------------------------------------------------------------- |
+| **Route**    | Endpoint definition + TypeBox request/response validation schemas. No logic |
+| **Handler**  | Parse request, call service, format response. No logic                      |
+| **Service**  | Business logic (hashing, token generation, authorization). No direct DB     |
+| **Repository** | Data access via Drizzle ORM. CRUD only. No logic                          |
+
+### Module Structure
+
+Each feature lives in its own module under `apps/api/src/modules/`:
+
+```
+modules/
+  auth/
+    auth.route.ts         → Endpoint definitions + TypeBox schemas
+    auth.handler.ts       → Request/response handling
+    auth.service.ts       → Business logic
+    auth.repository.ts    → Database queries
+    auth.schema.ts        → TypeBox validation schemas
+    auth.mapper.ts        → Entity → DTO transformations
+```
+
+### Data Flow & Type Mapping
+
+| Type              | Where Used          | Example                             |
+| ----------------- | ------------------- | ----------------------------------- |
+| **Entity**        | Repository ↔ Service | Full DB row (includes passwordHash) |
+| **Input DTO**     | Client → Handler    | `{ email, password, name }`         |
+| **Response DTO**  | Handler → Client    | `{ id, email, name }` (safe fields) |
+
+- **Entity types** are inferred from Drizzle schema (`$inferSelect` / `$inferInsert`).
+- **DTO interfaces** live in `packages/shared-types/` (shared with frontend).
+- **Mapper functions** (`auth.mapper.ts`) convert Entity → DTO. Sensitive fields (e.g., `passwordHash`) are stripped here.
+- **TypeBox schemas** (`auth.schema.ts`) handle runtime validation at the route level.
+
+### Plugins
+
+Cross-cutting concerns (JWT, cookie, database) are registered as Fastify plugins in `apps/api/src/plugins/`.
+
+### Guards
+
+Auth guards are implemented as `preHandler` hooks in `apps/api/src/common/guards.ts`.
+
 ## Current Features (MVP)
 
 - User authentication (register/login) with HTTP-only cookie JWT
