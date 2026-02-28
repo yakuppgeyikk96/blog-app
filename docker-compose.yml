@@ -28,6 +28,7 @@ services:
     environment:
       NODE_ENV: development
       DATABASE_URL: postgres://${DB_USER:-bloguser}:${DB_PASSWORD:-blogpass}@db:5432/${DB_NAME:-blogdb}
+      JWT_SECRET: ${JWT_SECRET}
     depends_on:
       db:
         condition: service_healthy

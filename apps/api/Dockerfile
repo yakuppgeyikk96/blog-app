@@ -10,6 +10,7 @@ FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json ./apps/api/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
+COPY packages/shared-types/package.json ./packages/shared-types/
 
 RUN pnpm install --frozen-lockfile
 
@@ -20,10 +21,10 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
-COPY --from=deps /app/packages/typescript-config/node_modules ./packages/typescript-config/node_modules 2>/dev/null || true
 
 COPY apps/api ./apps/api
 COPY packages/typescript-config ./packages/typescript-config
+COPY packages/shared-types ./packages/shared-types
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 
 RUN pnpm --filter @blog-app/api run build
@@ -42,4 +43,4 @@ WORKDIR /app/apps/api
 
 EXPOSE 3000
 
-CMD ["node", "node_modules/.bin/fastify", "start", "-l", "info", "-a", "0.0.0.0", "dist/app.js"]
+CMD ["npx", "fastify", "start", "-l", "info", "-a", "0.0.0.0", "dist/src/app.js"]
