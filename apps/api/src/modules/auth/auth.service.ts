@@ -1,12 +1,17 @@
 import * as argon2 from "argon2";
 import type { AuthRepository } from "./auth.repository";
 import type {
-  AuthResponse,
   JwtPayload,
   LoginInput,
   RegisterInput,
+  UserResponseDto,
 } from "./auth.types";
 import { toUserResponseDto } from "./auth.mapper";
+
+export interface AuthServiceResult {
+  user: UserResponseDto;
+  token: string;
+}
 
 interface AuthServiceDeps {
   authRepository: AuthRepository;
@@ -23,7 +28,7 @@ export function createAuthService({
   httpErrors,
 }: AuthServiceDeps) {
   return {
-    async register(input: RegisterInput): Promise<AuthResponse> {
+    async register(input: RegisterInput): Promise<AuthServiceResult> {
       const existing = await authRepository.findByEmail(input.email);
       if (existing) {
         throw httpErrors.conflict("Email already registered");
@@ -42,7 +47,7 @@ export function createAuthService({
       return { user: toUserResponseDto(user), token };
     },
 
-    async login(input: LoginInput): Promise<AuthResponse> {
+    async login(input: LoginInput): Promise<AuthServiceResult> {
       const user = await authRepository.findByEmail(input.email);
       if (!user) {
         throw httpErrors.unauthorized("Invalid email or password");

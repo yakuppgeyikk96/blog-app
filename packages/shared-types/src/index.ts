@@ -1,3 +1,4 @@
+export type { ApiResponse } from "./api.js";
 export type {
   UserResponseDto,
   RegisterInput,

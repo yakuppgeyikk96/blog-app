@@ -19,5 +19,4 @@ export interface LoginInput {
 
 export interface AuthResponse {
   user: UserResponseDto;
-  token: string;
 }
