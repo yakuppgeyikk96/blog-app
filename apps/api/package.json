@@ -18,8 +18,12 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@repo/shared-types": "workspace:*",
     "@fastify/autoload": "^6.0.0",
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/jwt": "^10.0.0",
     "@fastify/sensible": "^6.0.0",
+    "argon2": "^0.44.0",
     "drizzle-orm": "^0.45.1",
     "fastify": "^5.0.0",
     "fastify-cli": "^7.4.1",
