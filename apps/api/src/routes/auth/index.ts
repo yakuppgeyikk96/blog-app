@@ -2,7 +2,7 @@ import type { FastifyPluginAsync } from "fastify";
 import { createAuthRepository } from "../../modules/auth/auth.repository.js";
 import { createAuthService } from "../../modules/auth/auth.service.js";
 import { createAuthHandler } from "../../modules/auth/auth.handler.js";
-import { registerSchema, loginSchema } from "../../modules/auth/auth.schema.js";
+import { registerSchema, loginSchema, logoutSchema } from "../../modules/auth/auth.schema.js";
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   const authRepository = createAuthRepository(fastify.db);
@@ -17,6 +17,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
   fastify.post("/register", { schema: registerSchema }, handler.registerHandler);
   fastify.post("/login", { schema: loginSchema }, handler.loginHandler);
+  fastify.post("/logout", { schema: logoutSchema }, handler.logoutHandler);
 };
 
 export default authRoutes;

@@ -33,5 +33,11 @@ export function createAuthHandler(authService: AuthService) {
 
       return reply.status(200).send({ success: true, data: { user } });
     },
+
+    async logoutHandler(_request: FastifyRequest, reply: FastifyReply) {
+      reply.clearCookie("token", { path: "/" });
+
+      return reply.status(200).send({ success: true });
+    },
   };
 }

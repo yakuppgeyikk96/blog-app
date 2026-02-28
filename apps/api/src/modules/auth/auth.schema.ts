@@ -40,3 +40,11 @@ export const loginSchema = {
   body: LoginBody,
   response: { 200: AuthResponseSchema },
 };
+
+const LogoutResponseSchema = Type.Object({
+  success: Type.Literal(true),
+});
+
+export const logoutSchema = {
+  response: { 200: LogoutResponseSchema },
+};
