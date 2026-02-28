@@ -12,7 +12,10 @@
     "start": "tsc && fastify start -l info dist/app.js",
     "test": "tsc && tsc -p test/tsconfig.json && c8 node --test -r ts-node/register \"test/**/*.ts\"",
     "lint": "echo 'no lint configured yet'",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@fastify/autoload": "^6.0.0",
