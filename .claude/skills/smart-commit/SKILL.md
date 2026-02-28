@@ -74,8 +74,6 @@ For each group, in order:
 <type>: <concise summary>
 
 <optional body explaining why, not what>
-
-Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 ```
 
 **Types:**
@@ -91,7 +89,6 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 **Rules for commit messages:**
 - Summary line: imperative mood, lowercase, no period, max 72 chars.
 - Body (if needed): explain the **why**, not the **what**. The diff shows the what.
-- Always end with the `Co-Authored-By` line.
 - Always use a HEREDOC to pass the message to `git commit -m`.
 
 ## Important Rules
