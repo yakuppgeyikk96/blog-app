@@ -65,6 +65,18 @@ export function PostCard({ className, featured }: CardProps) {
 - Use a single icon library (e.g., `lucide-react`).
 - Size icons consistently using Tailwind width/height classes.
 
+## Images & Links
+- Always use `next/image` — never raw `<img>` tags. Provide `width`/`height` or use `fill` with a sized container.
+- Use `priority` prop on above-the-fold images (hero, LCP candidates).
+- Always use `next/link` for internal navigation — never raw `<a>` tags for same-app routes.
+
+## Forms
+- Compose forms from shadcn/ui primitives (`Input`, `Button`, `Label`, `Textarea`, `Select`).
+- Use Server Actions for form submissions when possible — simpler than client-side fetch.
+- For client-side forms, use `useActionState` or a form library with validation.
+- Always show loading/disabled states during submission.
+- Display inline validation errors next to the relevant field, not in a generic toast.
+
 ## Performance
 - Avoid unnecessary wrapper `<div>` elements.
 - Use `React.memo` only when profiling shows re-render issues — don't premature optimize.
