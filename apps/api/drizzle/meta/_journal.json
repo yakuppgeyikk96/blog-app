@@ -8,6 +8,13 @@
       "when": 1772269811181,
       "tag": "0000_magical_rick_jones",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1772352502932,
+      "tag": "0001_happy_doctor_faustus",
+      "breakpoints": true
     }
   ]
 }
