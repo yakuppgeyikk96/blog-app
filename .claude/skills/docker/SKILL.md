@@ -11,9 +11,9 @@ Based on the argument provided, run the appropriate docker compose command from 
 
 ## Commands
 
-- **up** — Start all services in detached mode and follow logs.
+- **up** — Start all services in detached mode and show recent logs.
   ```
-  docker compose up -d && docker compose logs -f
+  docker compose up -d && docker compose logs --tail=50
   ```
 
 - **down** — Stop and remove all services.
@@ -23,7 +23,7 @@ Based on the argument provided, run the appropriate docker compose command from 
 
 - **rebuild** — Rebuild all images from scratch and start services.
   ```
-  docker compose down && docker compose build --no-cache && docker compose up -d && docker compose logs -f
+  docker compose down && docker compose build --no-cache && docker compose up -d && docker compose logs --tail=50
   ```
 
 If no argument is provided, ask the user which action they want to perform: up, down, or rebuild.
