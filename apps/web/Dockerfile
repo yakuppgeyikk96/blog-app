@@ -30,6 +30,9 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 ARG NEXT_PUBLIC_API_URL=http://localhost:3001
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
+ARG API_URL=http://localhost:4000
+ENV API_URL=$API_URL
+
 RUN pnpm --filter web run build
 
 # --- Production ---
