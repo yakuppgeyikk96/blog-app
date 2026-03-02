@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 
 interface ProfileDropdownProps {
   user: { name: string; email: string };
+  onLogout: () => void;
 }
 
 function getInitials(name: string): string {
@@ -27,7 +28,7 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-export function ProfileDropdown({ user }: ProfileDropdownProps) {
+export function ProfileDropdown({ user, onLogout }: ProfileDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -50,7 +51,7 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive">
+        <DropdownMenuItem variant="destructive" onSelect={onLogout}>
           <LogOut className="size-4" />
           Logout
         </DropdownMenuItem>

@@ -1,11 +1,15 @@
-import Link from "next/link";
+"use client";
 
 import { Button } from "@/components/ui/button";
 
-export function LoginButton() {
+interface LoginButtonProps {
+  onClick: () => void;
+}
+
+export function LoginButton({ onClick }: LoginButtonProps) {
   return (
-    <Button variant="outline" asChild>
-      <Link href="/login">Login</Link>
+    <Button variant="outline" onClick={onClick}>
+      Login
     </Button>
   );
 }

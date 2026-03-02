@@ -1,9 +1,6 @@
 import Link from "next/link";
 
-import { LoginButton } from "@/components/layout/login-button";
-
-// TODO: Replace with real auth state
-const user = null;
+import { HeaderNav } from "@/components/layout/header-nav";
 
 export function Header() {
   return (
@@ -14,13 +11,7 @@ export function Header() {
         </Link>
 
         <nav className="flex items-center gap-2">
-          {user ? (
-            <>
-              {/* CreateButton + ProfileDropdown will render here when auth is integrated */}
-            </>
-          ) : (
-            <LoginButton />
-          )}
+          <HeaderNav />
         </nav>
       </div>
     </header>
