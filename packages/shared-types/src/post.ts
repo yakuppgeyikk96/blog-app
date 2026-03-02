@@ -31,7 +31,7 @@ export interface PostListItemDto {
 
 export interface CreatePostInput {
   title: string;
-  content: string;
+  content?: string;
   summary?: string;
   coverImage?: string;
   published?: boolean;

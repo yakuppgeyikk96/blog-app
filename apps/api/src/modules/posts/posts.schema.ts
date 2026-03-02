@@ -39,7 +39,7 @@ const PaginationSchema = Type.Object({
 
 const CreatePostBody = Type.Object({
   title: Type.String({ minLength: 1, maxLength: 200 }),
-  content: Type.String({ minLength: 1 }),
+  content: Type.Optional(Type.String()),
   summary: Type.Optional(Type.String({ maxLength: 500 })),
   coverImage: Type.Optional(Type.String({ format: "uri" })),
   published: Type.Optional(Type.Boolean()),

@@ -68,7 +68,7 @@ export function createPostsService({
       const post = await postsRepository.create({
         title: input.title,
         slug,
-        content: input.content,
+        content: input.content ?? "",
         summary: input.summary ?? null,
         coverImage: input.coverImage ?? null,
         published: input.published ?? false,
