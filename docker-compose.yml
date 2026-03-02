@@ -17,6 +17,40 @@ services:
       timeout: 5s
       retries: 5
 
+  minio:
+    image: minio/minio:latest
+    container_name: blog-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  createbucket:
+    image: minio/mc:latest
+    container_name: blog-minio-init
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 $${MINIO_ROOT_USER:-minioadmin} $${MINIO_ROOT_PASSWORD:-minioadmin};
+      mc mb --ignore-existing local/$${MINIO_BUCKET:-blog-uploads};
+      mc anonymous set download local/$${MINIO_BUCKET:-blog-uploads};
+      exit 0;
+      "
+
   api:
     build:
       context: .
@@ -29,8 +63,15 @@ services:
       NODE_ENV: development
       DATABASE_URL: postgres://${DB_USER:-bloguser}:${DB_PASSWORD:-blogpass}@db:5432/${DB_NAME:-blogdb}
       JWT_SECRET: ${JWT_SECRET}
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      S3_BUCKET: ${MINIO_BUCKET:-blog-uploads}
+      S3_REGION: us-east-1
     depends_on:
       db:
+        condition: service_healthy
+      minio:
         condition: service_healthy
 
   web:
@@ -53,3 +94,4 @@ services:
 
 volumes:
   pgdata:
+  minio-data:
