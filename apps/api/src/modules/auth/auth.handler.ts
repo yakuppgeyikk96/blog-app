@@ -39,5 +39,9 @@ export function createAuthHandler(authService: AuthService) {
 
       return reply.status(200).send({ success: true });
     },
+
+    async meHandler(request: FastifyRequest, reply: FastifyReply) {
+      return reply.status(200).send({ success: true, data: { user: request.user } });
+    },
   };
 }

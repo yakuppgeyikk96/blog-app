@@ -48,3 +48,7 @@ const LogoutResponseSchema = Type.Object({
 export const logoutSchema = {
   response: { 200: LogoutResponseSchema },
 };
+
+export const meSchema = {
+  response: { 200: AuthResponseSchema },
+};

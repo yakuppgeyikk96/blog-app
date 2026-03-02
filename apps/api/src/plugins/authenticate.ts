@@ -15,6 +15,8 @@ export default fp(async (fastify) => {
             id: users.id,
             email: users.email,
             name: users.name,
+            createdAt: users.createdAt,
+            updatedAt: users.updatedAt,
           })
           .from(users)
           .where(eq(users.id, payload.sub));
@@ -38,6 +40,8 @@ declare module "@fastify/jwt" {
       id: string;
       email: string;
       name: string;
+      createdAt: Date;
+      updatedAt: Date;
     };
   }
 }
