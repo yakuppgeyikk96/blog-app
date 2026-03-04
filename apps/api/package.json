@@ -18,9 +18,11 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1001.0",
     "@fastify/autoload": "^6.0.0",
     "@fastify/cookie": "^11.0.2",
     "@fastify/jwt": "^10.0.0",
+    "@fastify/multipart": "^9.4.0",
     "@fastify/sensible": "^6.0.0",
     "@repo/shared-types": "workspace:*",
     "@sinclair/typebox": "^0.34.48",
