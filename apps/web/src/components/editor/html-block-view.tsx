@@ -1,10 +1,14 @@
 "use client";
 
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
-import { Code, Eye } from "lucide-react";
+import { Code, Eye, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-export function HtmlBlockView({ node, updateAttributes }: NodeViewProps) {
+export function HtmlBlockView({
+  node,
+  updateAttributes,
+  deleteNode,
+}: NodeViewProps) {
   const content = (node.attrs.content as string) || "";
   const [editing, setEditing] = useState(!content);
 
@@ -13,18 +17,27 @@ export function HtmlBlockView({ node, updateAttributes }: NodeViewProps) {
       <div className="overflow-hidden rounded-lg border border-muted">
         <div className="flex items-center justify-between bg-muted/50 px-3 py-1.5 text-xs text-muted-foreground">
           <span>HTML Block</span>
-          <button
-            type="button"
-            onClick={() => setEditing(!editing)}
-            className="flex items-center gap-1 rounded px-2 py-0.5 hover:bg-accent"
-          >
-            {editing ? (
-              <Eye className="h-3 w-3" />
-            ) : (
-              <Code className="h-3 w-3" />
-            )}
-            {editing ? "Preview" : "Edit"}
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setEditing(!editing)}
+              className="flex items-center gap-1 rounded px-2 py-0.5 hover:bg-accent"
+            >
+              {editing ? (
+                <Eye className="h-3 w-3" />
+              ) : (
+                <Code className="h-3 w-3" />
+              )}
+              {editing ? "Preview" : "Edit"}
+            </button>
+            <button
+              type="button"
+              onClick={deleteNode}
+              className="flex items-center gap-1 rounded px-2 py-0.5 text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="h-3 w-3" />
+            </button>
+          </div>
         </div>
 
         {editing ? (
@@ -32,7 +45,7 @@ export function HtmlBlockView({ node, updateAttributes }: NodeViewProps) {
             value={content}
             onChange={(e) => updateAttributes({ content: e.target.value })}
             placeholder='<img src="..." alt="..." />'
-            className="w-full min-h-[100px] resize-y bg-muted/30 p-3 font-mono text-sm focus:outline-none"
+            className="w-full min-h-25 resize-y bg-muted/30 p-3 font-mono text-sm focus:outline-none"
             spellCheck={false}
           />
         ) : content ? (
