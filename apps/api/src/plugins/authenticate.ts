@@ -32,6 +32,33 @@ export default fp(async (fastify) => {
       }
     },
   );
+
+  fastify.decorate(
+    "optionalAuthenticate",
+    async function (request: FastifyRequest, _reply: FastifyReply) {
+      try {
+        const payload = await request.jwtVerify<{ sub: string }>();
+
+        const result = await fastify.db
+          .select({
+            id: users.id,
+            email: users.email,
+            name: users.name,
+            createdAt: users.createdAt,
+            updatedAt: users.updatedAt,
+          })
+          .from(users)
+          .where(eq(users.id, payload.sub));
+
+        const user = result[0];
+        if (user) {
+          request.user = user;
+        }
+      } catch {
+        // No valid token — continue as unauthenticated
+      }
+    },
+  );
 });
 
 declare module "@fastify/jwt" {
@@ -49,6 +76,10 @@ declare module "@fastify/jwt" {
 declare module "fastify" {
   interface FastifyInstance {
     authenticate: (
+      request: FastifyRequest,
+      reply: FastifyReply,
+    ) => Promise<void>;
+    optionalAuthenticate: (
       request: FastifyRequest,
       reply: FastifyReply,
     ) => Promise<void>;

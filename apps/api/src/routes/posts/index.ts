@@ -22,7 +22,13 @@ const postsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Public routes
   fastify.get("/", { schema: listPostsSchema }, handler.listPostsHandler);
-  fastify.get("/:id", { schema: getPostSchema }, handler.getPostHandler);
+  fastify.route({
+    method: "GET",
+    url: "/:id",
+    schema: getPostSchema,
+    onRequest: [fastify.optionalAuthenticate],
+    handler: handler.getPostHandler,
+  });
 
   // Protected routes
   fastify.register(async (scope) => {
