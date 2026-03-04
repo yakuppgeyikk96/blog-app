@@ -15,12 +15,13 @@ import {
 import { useDebouncedCallback } from "use-debounce";
 import type { PostResponseDto, UpdatePostInput } from "@repo/shared-types";
 import { api } from "@/lib/api";
-import { Eye } from "lucide-react";
+import { Eye, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { defaultExtensions } from "./extensions";
 import { slashCommand, suggestionItems } from "./slash-command";
 import { BubbleMenu } from "./bubble-menu";
 import { PostPreviewDialog } from "./post-preview-dialog";
+import { PublishDialog } from "./publish-dialog";
 
 const extensions = [...defaultExtensions, slashCommand];
 
@@ -38,6 +39,7 @@ export function PostEditor({ postId }: PostEditorProps) {
   const [title, setTitle] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewContent, setPreviewContent] = useState("");
+  const [publishOpen, setPublishOpen] = useState(false);
   const editorRef = useRef<EditorInstance | null>(null);
 
   useEffect(() => {
@@ -115,6 +117,11 @@ export function PostEditor({ postId }: PostEditorProps) {
     <div className="mx-auto max-w-3xl py-8">
       <div className="mb-4 flex items-center gap-3">
         <SaveStatusIndicator status={saveStatus} />
+        {post.published && (
+          <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+            Published
+          </span>
+        )}
         <div className="ml-auto" />
         <Button
           variant="outline"
@@ -127,6 +134,12 @@ export function PostEditor({ postId }: PostEditorProps) {
           <Eye className="mr-1.5 size-4" />
           Preview
         </Button>
+        {!post.published && (
+          <Button size="sm" onClick={() => setPublishOpen(true)}>
+            <Send className="mr-1.5 size-4" />
+            Publish
+          </Button>
+        )}
       </div>
 
       <input
@@ -201,6 +214,14 @@ export function PostEditor({ postId }: PostEditorProps) {
         onOpenChange={setPreviewOpen}
         title={title}
         content={previewContent}
+      />
+      <PublishDialog
+        open={publishOpen}
+        onOpenChange={setPublishOpen}
+        postId={postId}
+        initialSummary={post.summary}
+        initialCoverImage={post.coverImage}
+        onPublished={() => setPost((prev) => prev ? { ...prev, published: true } : prev)}
       />
     </div>
   );
