@@ -30,9 +30,15 @@ export function createPostsService({
       .replace(/^-|-$/g, "");
   }
 
-  async function generateUniqueSlug(title: string): Promise<string> {
+  async function generateUniqueSlug(
+    title: string,
+    excludePostId?: string,
+  ): Promise<string> {
     const baseSlug = generateBaseSlug(title);
-    const existingSlugs = await postsRepository.findSlugStartingWith(baseSlug);
+    const existingSlugs = await postsRepository.findSlugStartingWith(
+      baseSlug,
+      excludePostId,
+    );
 
     if (existingSlugs.length === 0) {
       return baseSlug;
@@ -164,6 +170,12 @@ export function createPostsService({
       assertOwnership(existing.authorId, userId);
 
       const updateData: Record<string, unknown> = {};
+
+      const isPublishing = input.published === true && !existing.published;
+      if (isPublishing) {
+        const currentTitle = input.title ?? existing.title;
+        updateData.slug = await generateUniqueSlug(currentTitle, id);
+      }
 
       if (input.title !== undefined) {
         updateData.title = input.title;

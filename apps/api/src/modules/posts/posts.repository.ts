@@ -47,12 +47,17 @@ export function createPostsRepository(db: DbType) {
 
     async findSlugStartingWith(
       baseSlug: string,
+      excludeId?: string,
     ): Promise<{ slug: string }[]> {
+      const slugCondition = sql`${posts.slug} = ${baseSlug} OR ${posts.slug} LIKE ${baseSlug + "-%"}`;
+
       return db
         .select({ slug: posts.slug })
         .from(posts)
         .where(
-          sql`${posts.slug} = ${baseSlug} OR ${posts.slug} LIKE ${baseSlug + "-%"}`,
+          excludeId
+            ? and(slugCondition, ne(posts.id, excludeId))
+            : slugCondition,
         );
     },
 
