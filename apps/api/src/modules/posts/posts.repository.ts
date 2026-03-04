@@ -45,6 +45,18 @@ export function createPostsRepository(db: DbType) {
       return result[0];
     },
 
+    async findBySlugWithAuthor(
+      slug: string,
+    ): Promise<PostWithAuthor | undefined> {
+      const result = await db
+        .select(postWithAuthorColumns)
+        .from(posts)
+        .innerJoin(users, eq(posts.authorId, users.id))
+        .where(eq(posts.slug, slug));
+
+      return result[0];
+    },
+
     async findSlugStartingWith(
       baseSlug: string,
       excludeId?: string,

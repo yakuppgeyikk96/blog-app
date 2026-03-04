@@ -1,4 +1,9 @@
-import type { PaginatedApiResponse, PostListItemDto } from "@repo/shared-types";
+import type {
+  ApiResponse,
+  PaginatedApiResponse,
+  PostListItemDto,
+  PostResponseDto,
+} from "@repo/shared-types";
 import { serverApi } from "@/lib/server-api";
 
 export async function fetchPublishedPosts(
@@ -7,5 +12,11 @@ export async function fetchPublishedPosts(
 ) {
   return serverApi<PaginatedApiResponse<PostListItemDto>>(
     `/posts?page=${page}&limit=${limit}`,
+  );
+}
+
+export async function fetchPostBySlug(slug: string) {
+  return serverApi<ApiResponse<{ post: PostResponseDto }>>(
+    `/posts/by-slug/${slug}`,
   );
 }

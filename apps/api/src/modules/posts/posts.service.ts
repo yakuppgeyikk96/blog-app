@@ -105,6 +105,22 @@ export function createPostsService({
       return toPostResponseDto(post);
     },
 
+    async getBySlug(
+      slug: string,
+      userId?: string,
+    ): Promise<PostResponseDto> {
+      const post = await postsRepository.findBySlugWithAuthor(slug);
+      if (!post) {
+        throw httpErrors.notFound("Post not found");
+      }
+
+      if (!post.published && post.authorId !== userId) {
+        throw httpErrors.notFound("Post not found");
+      }
+
+      return toPostResponseDto(post);
+    },
+
     async list(
       page: number,
       limit: number,

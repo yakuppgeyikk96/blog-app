@@ -5,6 +5,7 @@ import { createPostsHandler } from "../../modules/posts/posts.handler.js";
 import {
   createPostSchema,
   getPostSchema,
+  getPostBySlugSchema,
   listPostsSchema,
   updatePostSchema,
   deletePostSchema,
@@ -22,6 +23,13 @@ const postsRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Public routes
   fastify.get("/", { schema: listPostsSchema }, handler.listPostsHandler);
+  fastify.route({
+    method: "GET",
+    url: "/by-slug/:slug",
+    schema: getPostBySlugSchema,
+    onRequest: [fastify.optionalAuthenticate],
+    handler: handler.getPostBySlugHandler,
+  });
   fastify.route({
     method: "GET",
     url: "/:id",

@@ -61,6 +61,10 @@ const PostIdParams = Type.Object({
   id: Type.String({ format: "uuid" }),
 });
 
+const PostSlugParams = Type.Object({
+  slug: Type.String({ minLength: 1 }),
+});
+
 const ListPostsQuerystring = Type.Object({
   page: Type.Optional(Type.Integer({ minimum: 1, default: 1 })),
   limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 50, default: 10 })),
@@ -88,6 +92,7 @@ const SuccessDeleteResponse = Type.Object({
 export type CreatePostBodyType = Static<typeof CreatePostBody>;
 export type UpdatePostBodyType = Static<typeof UpdatePostBody>;
 export type PostIdParamsType = Static<typeof PostIdParams>;
+export type PostSlugParamsType = Static<typeof PostSlugParams>;
 export type ListPostsQuerystringType = Static<typeof ListPostsQuerystring>;
 
 export const createPostSchema = {
@@ -108,6 +113,11 @@ export const listPostsSchema = {
 export const updatePostSchema = {
   params: PostIdParams,
   body: UpdatePostBody,
+  response: { 200: SuccessPostResponse },
+};
+
+export const getPostBySlugSchema = {
+  params: PostSlugParams,
   response: { 200: SuccessPostResponse },
 };
 

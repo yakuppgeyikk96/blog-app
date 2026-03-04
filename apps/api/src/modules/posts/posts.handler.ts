@@ -4,6 +4,7 @@ import type {
   CreatePostBodyType,
   UpdatePostBodyType,
   PostIdParamsType,
+  PostSlugParamsType,
   ListPostsQuerystringType,
 } from "./posts.schema";
 
@@ -24,6 +25,18 @@ export function createPostsHandler(postsService: PostsService) {
     ) {
       const post = await postsService.getById(
         request.params.id,
+        request.user?.id,
+      );
+
+      return reply.status(200).send({ success: true, data: { post } });
+    },
+
+    async getPostBySlugHandler(
+      request: FastifyRequest<{ Params: PostSlugParamsType }>,
+      reply: FastifyReply,
+    ) {
+      const post = await postsService.getBySlug(
+        request.params.slug,
         request.user?.id,
       );
 
