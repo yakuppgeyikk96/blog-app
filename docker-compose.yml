@@ -68,6 +68,7 @@ services:
       S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
       S3_BUCKET: ${MINIO_BUCKET:-blog-uploads}
       S3_REGION: us-east-1
+      S3_PUBLIC_ENDPOINT: http://localhost:9000
     depends_on:
       db:
         condition: service_healthy
