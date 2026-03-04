@@ -15,9 +15,12 @@ import {
 import { useDebouncedCallback } from "use-debounce";
 import type { PostResponseDto, UpdatePostInput } from "@repo/shared-types";
 import { api } from "@/lib/api";
+import { Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { defaultExtensions } from "./extensions";
 import { slashCommand, suggestionItems } from "./slash-command";
 import { BubbleMenu } from "./bubble-menu";
+import { PostPreviewDialog } from "./post-preview-dialog";
 
 const extensions = [...defaultExtensions, slashCommand];
 
@@ -33,6 +36,8 @@ export function PostEditor({ postId }: PostEditorProps) {
   const [error, setError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [title, setTitle] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewContent, setPreviewContent] = useState("");
   const editorRef = useRef<EditorInstance | null>(null);
 
   useEffect(() => {
@@ -108,8 +113,19 @@ export function PostEditor({ postId }: PostEditorProps) {
 
   return (
     <div className="mx-auto max-w-3xl py-8">
-      <div className="mb-4 flex items-center justify-end">
+      <div className="mb-4 flex items-center justify-end gap-3">
         <SaveStatusIndicator status={saveStatus} />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setPreviewContent(editorRef.current?.getHTML() ?? "");
+            setPreviewOpen(true);
+          }}
+        >
+          <Eye className="mr-1.5 size-4" />
+          Preview
+        </Button>
       </div>
 
       <input
@@ -179,6 +195,12 @@ export function PostEditor({ postId }: PostEditorProps) {
           </EditorContent>
         </EditorRoot>
       </div>
+      <PostPreviewDialog
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        title={title}
+        content={previewContent}
+      />
     </div>
   );
 }
