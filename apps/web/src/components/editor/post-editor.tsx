@@ -113,8 +113,9 @@ export function PostEditor({ postId }: PostEditorProps) {
 
   return (
     <div className="mx-auto max-w-3xl py-8">
-      <div className="mb-4 flex items-center justify-end gap-3">
+      <div className="mb-4 flex items-center gap-3">
         <SaveStatusIndicator status={saveStatus} />
+        <div className="ml-auto" />
         <Button
           variant="outline"
           size="sm"
@@ -208,19 +209,39 @@ export function PostEditor({ postId }: PostEditorProps) {
 function SaveStatusIndicator({ status }: { status: SaveStatus }) {
   if (status === "idle") return null;
 
-  const labels: Record<Exclude<SaveStatus, "idle">, string> = {
-    saving: "Saving...",
-    saved: "Saved",
-    error: "Save failed",
-  };
-
-  const colors: Record<Exclude<SaveStatus, "idle">, string> = {
-    saving: "text-muted-foreground",
-    saved: "text-muted-foreground",
-    error: "text-destructive",
-  };
-
-  return <span className={`text-sm ${colors[status]}`}>{labels[status]}</span>;
+  return (
+    <span className="flex items-center gap-1.5 text-sm">
+      {status === "saving" && (
+        <span className="text-muted-foreground">Saving...</span>
+      )}
+      {status === "saved" && (
+        <>
+          <svg
+            className="size-4 text-green-500"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path
+              d="M4 12l6 6L20 6"
+              className="animate-[draw-check_0.3s_ease-out_forwards]"
+              style={{
+                strokeDasharray: 24,
+                strokeDashoffset: 24,
+              }}
+            />
+          </svg>
+          <span className="text-muted-foreground">Saved</span>
+        </>
+      )}
+      {status === "error" && (
+        <span className="text-destructive">Save failed</span>
+      )}
+    </span>
+  );
 }
 
 function htmlToInitialContent(html: string): JSONContent | undefined {

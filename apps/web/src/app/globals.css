@@ -126,6 +126,12 @@
   }
 }
 
+@keyframes draw-check {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 /* ProseMirror editor styles */
 .ProseMirror .is-editor-empty:first-child::before {
   content: attr(data-placeholder);
