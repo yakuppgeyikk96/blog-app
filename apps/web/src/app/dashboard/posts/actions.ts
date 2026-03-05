@@ -17,3 +17,12 @@ export async function deletePost(id: string): Promise<void> {
   await serverApi(`/posts/${id}`, { method: "DELETE" });
   revalidatePath("/dashboard/posts");
 }
+
+export async function unpublishPost(id: string): Promise<void> {
+  await serverApi(`/posts/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ published: false }),
+  });
+  revalidatePath("/dashboard/posts");
+}

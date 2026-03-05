@@ -3,6 +3,7 @@ import { FileText, Pencil } from "lucide-react";
 import type { PostListItemDto } from "@repo/shared-types";
 import { formatDate } from "@/lib/format";
 import { DeletePostButton } from "./delete-post-button";
+import { UnpublishPostButton } from "./unpublish-post-button";
 
 interface PostListProps {
   posts: PostListItemDto[];
@@ -38,7 +39,9 @@ function PostListItem({ post }: { post: PostListItemDto }) {
         </div>
       </div>
       <div className="ml-4 flex items-center gap-1">
-        {!post.published && (
+        {post.published ? (
+          <UnpublishPostButton postId={post.id} postTitle={post.title} />
+        ) : (
           <DeletePostButton postId={post.id} postTitle={post.title} />
         )}
         <Link
