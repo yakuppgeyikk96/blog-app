@@ -7,6 +7,7 @@ import type {
   Pagination,
 } from "./posts.types";
 import { toPostResponseDto, toPostListItemDto } from "./posts.mapper";
+import { sanitizeContent } from "../../common/sanitize";
 
 interface PostsServiceDeps {
   postsRepository: PostsRepository;
@@ -74,7 +75,7 @@ export function createPostsService({
       const post = await postsRepository.create({
         title: input.title,
         slug,
-        content: input.content ?? "",
+        content: sanitizeContent(input.content ?? ""),
         summary: input.summary ?? null,
         coverImage: input.coverImage ?? null,
         published: input.published ?? false,
@@ -197,7 +198,7 @@ export function createPostsService({
         updateData.title = input.title;
       }
       if (input.content !== undefined) {
-        updateData.content = input.content;
+        updateData.content = sanitizeContent(input.content);
       }
       if (input.summary !== undefined) {
         updateData.summary = input.summary;
