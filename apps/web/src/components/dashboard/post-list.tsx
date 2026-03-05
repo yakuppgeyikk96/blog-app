@@ -2,6 +2,7 @@ import Link from "next/link";
 import { FileText, Pencil } from "lucide-react";
 import type { PostListItemDto } from "@repo/shared-types";
 import { formatDate } from "@/lib/format";
+import { DeletePostButton } from "./delete-post-button";
 
 interface PostListProps {
   posts: PostListItemDto[];
@@ -36,12 +37,17 @@ function PostListItem({ post }: { post: PostListItemDto }) {
           <span>{formatDate(post.createdAt)}</span>
         </div>
       </div>
-      <Link
-        href={`/dashboard/posts/${post.id}/edit`}
-        className="ml-4 rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground"
-      >
-        <Pencil className="size-4" />
-      </Link>
+      <div className="ml-4 flex items-center gap-1">
+        {!post.published && (
+          <DeletePostButton postId={post.id} postTitle={post.title} />
+        )}
+        <Link
+          href={`/dashboard/posts/${post.id}/edit`}
+          className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground"
+        >
+          <Pencil className="size-4" />
+        </Link>
+      </div>
     </li>
   );
 }
