@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { PostListItemDto } from "@repo/shared-types";
 import { formatDate } from "@/lib/format";
+import { Badge } from "@/components/ui/badge";
 
 interface PostCardProps {
   post: PostListItemDto;
@@ -30,6 +31,15 @@ export function PostCard({ post }: PostCardProps) {
         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
           {post.summary ?? "No summary available"}
         </p>
+        {post.tags.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {post.tags.map((tag) => (
+              <Badge key={tag.id} variant="secondary" className="text-xs">
+                {tag.name}
+              </Badge>
+            ))}
+          </div>
+        )}
         <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
           <span>{post.author.name}</span>
           <span>&middot;</span>

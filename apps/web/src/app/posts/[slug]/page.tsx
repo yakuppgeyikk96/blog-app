@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { fetchPostBySlug } from "@/app/actions";
 import { formatDate } from "@/lib/format";
+import { Badge } from "@/components/ui/badge";
 
 export const revalidate = 3600;
 
@@ -61,6 +62,15 @@ export default async function PostPage({ params }: PostPageProps) {
             {formatDate(post.createdAt)}
           </time>
         </div>
+        {post.tags.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {post.tags.map((tag) => (
+              <Badge key={tag.id} variant="secondary">
+                {tag.name}
+              </Badge>
+            ))}
+          </div>
+        )}
       </header>
 
       <div

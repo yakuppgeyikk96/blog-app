@@ -5,8 +5,10 @@ import { ImagePlus, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +24,7 @@ interface PublishDialogProps {
   postId: string;
   initialSummary: string | null;
   initialCoverImage: string | null;
+  initialTags: string[];
   onPublished: () => void;
 }
 
@@ -31,13 +34,42 @@ export function PublishDialog({
   postId,
   initialSummary,
   initialCoverImage,
+  initialTags,
   onPublished,
 }: PublishDialogProps) {
   const [summary, setSummary] = useState(initialSummary ?? "");
   const [coverImage, setCoverImage] = useState(initialCoverImage ?? "");
+  const [tags, setTags] = useState<string[]>(initialTags);
+  const [tagInput, setTagInput] = useState("");
   const [uploading, setUploading] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function addTag(raw: string) {
+    const name = raw.trim().toLowerCase();
+    if (!name) return;
+    if (tags.includes(name)) {
+      setTagInput("");
+      return;
+    }
+    if (tags.length >= 5) return;
+    setTags((prev) => [...prev, name]);
+    setTagInput("");
+  }
+
+  function removeTag(name: string) {
+    setTags((prev) => prev.filter((t) => t !== name));
+  }
+
+  function handleTagKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addTag(tagInput);
+    }
+    if (e.key === "Backspace" && !tagInput && tags.length > 0) {
+      setTags((prev) => prev.slice(0, -1));
+    }
+  }
 
   async function handleImageUpload(file: File) {
     setUploading(true);
@@ -86,6 +118,7 @@ export function PublishDialog({
           published: true,
           summary: summary || null,
           coverImage: coverImage || null,
+          tags,
         }),
       });
 
@@ -129,6 +162,43 @@ export function PublishDialog({
               rows={3}
               maxLength={500}
             />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="tags">Tags</Label>
+              <span className="text-xs text-muted-foreground">
+                {tags.length}/5
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5 rounded-md border px-3 py-2">
+              {tags.map((tag) => (
+                <Badge key={tag} variant="secondary" className="gap-1">
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => removeTag(tag)}
+                    className="ml-0.5 rounded-full hover:text-destructive"
+                  >
+                    <X className="size-3" />
+                  </button>
+                </Badge>
+              ))}
+              {tags.length < 5 && (
+                <Input
+                  id="tags"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleTagKeyDown}
+                  onBlur={() => addTag(tagInput)}
+                  placeholder={tags.length === 0 ? "Add tags..." : ""}
+                  className="h-auto min-w-[80px] flex-1 border-0 p-0 shadow-none focus-visible:ring-0"
+                />
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Press Enter or comma to add a tag.
+            </p>
           </div>
 
           <div className="space-y-2">

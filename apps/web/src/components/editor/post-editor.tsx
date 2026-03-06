@@ -221,6 +221,7 @@ export function PostEditor({ postId }: PostEditorProps) {
         postId={postId}
         initialSummary={post.summary}
         initialCoverImage={post.coverImage}
+        initialTags={post.tags.map((t) => t.name)}
         onPublished={() => setPost((prev) => prev ? { ...prev, published: true } : prev)}
       />
     </div>
