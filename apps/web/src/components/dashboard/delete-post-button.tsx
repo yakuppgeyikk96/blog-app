@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,8 +27,13 @@ export function DeletePostButton({ postId, postTitle }: DeletePostButtonProps) {
 
   function handleDelete() {
     startTransition(async () => {
-      await deletePost(postId);
+      const result = await deletePost(postId);
       setOpen(false);
+      if (result.success) {
+        toast.success("Post deleted");
+      } else {
+        toast.error(result.error ?? "Failed to delete post");
+      }
     });
   }
 

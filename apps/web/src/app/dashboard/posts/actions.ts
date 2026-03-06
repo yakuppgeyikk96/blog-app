@@ -13,16 +13,36 @@ export async function fetchMyPosts(
   );
 }
 
-export async function deletePost(id: string): Promise<void> {
-  await serverApi(`/posts/${id}`, { method: "DELETE" });
-  revalidatePath("/dashboard/posts");
+export async function deletePost(
+  id: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    await serverApi(`/posts/${id}`, { method: "DELETE" });
+    revalidatePath("/dashboard/posts");
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to delete post",
+    };
+  }
 }
 
-export async function unpublishPost(id: string): Promise<void> {
-  await serverApi(`/posts/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ published: false }),
-  });
-  revalidatePath("/dashboard/posts");
+export async function unpublishPost(
+  id: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    await serverApi(`/posts/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ published: false }),
+    });
+    revalidatePath("/dashboard/posts");
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to unpublish post",
+    };
+  }
 }

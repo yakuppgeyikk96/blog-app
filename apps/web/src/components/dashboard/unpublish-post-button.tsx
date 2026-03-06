@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { EyeOff } from "lucide-react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,8 +30,13 @@ export function UnpublishPostButton({
 
   function handleUnpublish() {
     startTransition(async () => {
-      await unpublishPost(postId);
+      const result = await unpublishPost(postId);
       setOpen(false);
+      if (result.success) {
+        toast.success("Post reverted to draft");
+      } else {
+        toast.error(result.error ?? "Failed to unpublish post");
+      }
     });
   }
 

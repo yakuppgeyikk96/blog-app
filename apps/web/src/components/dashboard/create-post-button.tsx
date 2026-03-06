@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
@@ -28,7 +29,10 @@ export function CreatePostButton() {
         body: JSON.stringify({ title: "Untitled" }),
       });
       router.push(`/dashboard/posts/${res.data.post.id}/edit`);
-    } catch {
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to create post",
+      );
       setLoading(false);
     }
   }

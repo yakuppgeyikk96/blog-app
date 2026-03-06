@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ImagePlus, Loader2, X } from "lucide-react";
+import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -88,10 +89,13 @@ export function PublishDialog({
         }),
       });
 
+      toast.success("Post published");
       onPublished();
       onOpenChange(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Publish failed");
+      const message = err instanceof Error ? err.message : "Publish failed";
+      setError(message);
+      toast.error(message);
     } finally {
       setPublishing(false);
     }
