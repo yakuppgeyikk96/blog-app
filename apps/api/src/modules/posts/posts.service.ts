@@ -1,4 +1,4 @@
-import type { PostsRepository } from "./posts.repository";
+import type { PostsRepository, PostWithAuthor } from "./posts.repository";
 import type { TagsService } from "../tags/tags.service";
 import type {
   CreatePostInput,
@@ -68,6 +68,33 @@ export function createPostsService({
     }
   }
 
+  async function paginateWithTags(
+    page: number,
+    limit: number,
+    fetchFn: (opts: { offset: number; limit: number }) => Promise<{ items: PostWithAuthor[]; total: number }>,
+  ): Promise<{ items: PostListItemDto[]; pagination: Pagination }> {
+    const clampedLimit = Math.min(Math.max(limit, 1), 50);
+    const clampedPage = Math.max(page, 1);
+    const offset = (clampedPage - 1) * clampedLimit;
+
+    const { items, total } = await fetchFn({ offset, limit: clampedLimit });
+
+    const postIds = items.map((p) => p.id);
+    const tagMap = await tagsService.getTagsForPosts(postIds);
+
+    return {
+      items: items.map((item) =>
+        toPostListItemDto(item, tagMap.get(item.id) ?? []),
+      ),
+      pagination: {
+        total,
+        page: clampedPage,
+        limit: clampedLimit,
+        totalPages: Math.ceil(total / clampedLimit),
+      },
+    };
+  }
+
   return {
     async create(
       input: CreatePostInput,
@@ -132,30 +159,9 @@ export function createPostsService({
       limit: number,
       userId?: string,
     ): Promise<{ items: PostListItemDto[]; pagination: Pagination }> {
-      const clampedLimit = Math.min(Math.max(limit, 1), 50);
-      const clampedPage = Math.max(page, 1);
-      const offset = (clampedPage - 1) * clampedLimit;
-
-      const { items, total } = await postsRepository.findMany({
-        offset,
-        limit: clampedLimit,
-        excludeAuthorId: userId,
-      });
-
-      const postIds = items.map((p) => p.id);
-      const tagMap = await tagsService.getTagsForPosts(postIds);
-
-      return {
-        items: items.map((item) =>
-          toPostListItemDto(item, tagMap.get(item.id) ?? []),
-        ),
-        pagination: {
-          total,
-          page: clampedPage,
-          limit: clampedLimit,
-          totalPages: Math.ceil(total / clampedLimit),
-        },
-      };
+      return paginateWithTags(page, limit, (opts) =>
+        postsRepository.findMany({ ...opts, excludeAuthorId: userId }),
+      );
     },
 
     async listByAuthor(
@@ -163,30 +169,9 @@ export function createPostsService({
       page: number,
       limit: number,
     ): Promise<{ items: PostListItemDto[]; pagination: Pagination }> {
-      const clampedLimit = Math.min(Math.max(limit, 1), 50);
-      const clampedPage = Math.max(page, 1);
-      const offset = (clampedPage - 1) * clampedLimit;
-
-      const { items, total } = await postsRepository.findByAuthor({
-        authorId,
-        offset,
-        limit: clampedLimit,
-      });
-
-      const postIds = items.map((p) => p.id);
-      const tagMap = await tagsService.getTagsForPosts(postIds);
-
-      return {
-        items: items.map((item) =>
-          toPostListItemDto(item, tagMap.get(item.id) ?? []),
-        ),
-        pagination: {
-          total,
-          page: clampedPage,
-          limit: clampedLimit,
-          totalPages: Math.ceil(total / clampedLimit),
-        },
-      };
+      return paginateWithTags(page, limit, (opts) =>
+        postsRepository.findByAuthor({ ...opts, authorId }),
+      );
     },
 
     async update(

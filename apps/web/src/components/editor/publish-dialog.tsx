@@ -79,17 +79,11 @@ export function PublishDialog({
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch("/api/uploads/image", {
+      const data = await api<{ data: { url: string } }>("/uploads/image", {
         method: "POST",
         body: formData,
       });
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.message ?? "Upload failed");
-      }
-
-      const data = (await res.json()) as { data: { url: string } };
       setCoverImage(data.data.url);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
