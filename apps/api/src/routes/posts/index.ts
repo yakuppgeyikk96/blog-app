@@ -10,12 +10,17 @@ import {
   updatePostSchema,
   deletePostSchema,
 } from "../../modules/posts/posts.schema.js";
+import { createTagsRepository } from "../../modules/tags/tags.repository.js";
+import { createTagsService } from "../../modules/tags/tags.service.js";
 
 const postsRoutes: FastifyPluginAsync = async (fastify) => {
   const postsRepository = createPostsRepository(fastify.db);
+  const tagsRepository = createTagsRepository(fastify.db);
+  const tagsService = createTagsService({ tagsRepository });
 
   const postsService = createPostsService({
     postsRepository,
+    tagsService,
     httpErrors: fastify.httpErrors,
   });
 

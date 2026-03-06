@@ -1,3 +1,5 @@
+import type { TagDto } from "./tag.js";
+
 export interface PostResponseDto {
   id: string;
   title: string;
@@ -10,6 +12,7 @@ export interface PostResponseDto {
     id: string;
     name: string;
   };
+  tags: TagDto[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +28,7 @@ export interface PostListItemDto {
     id: string;
     name: string;
   };
+  tags: TagDto[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,4 +47,5 @@ export interface UpdatePostInput {
   summary?: string | null;
   coverImage?: string | null;
   published?: boolean;
+  tags?: string[];
 }

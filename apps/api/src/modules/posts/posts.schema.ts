@@ -5,6 +5,12 @@ const AuthorSchema = Type.Object({
   name: Type.String(),
 });
 
+const TagSchema = Type.Object({
+  id: Type.String(),
+  name: Type.String(),
+  slug: Type.String(),
+});
+
 const PostResponseSchema = Type.Object({
   id: Type.String(),
   title: Type.String(),
@@ -14,6 +20,7 @@ const PostResponseSchema = Type.Object({
   coverImage: Type.Union([Type.String(), Type.Null()]),
   published: Type.Boolean(),
   author: AuthorSchema,
+  tags: Type.Array(TagSchema),
   createdAt: Type.String({ format: "date-time" }),
   updatedAt: Type.String({ format: "date-time" }),
 });
@@ -26,6 +33,7 @@ const PostListItemSchema = Type.Object({
   coverImage: Type.Union([Type.String(), Type.Null()]),
   published: Type.Boolean(),
   author: AuthorSchema,
+  tags: Type.Array(TagSchema),
   createdAt: Type.String({ format: "date-time" }),
   updatedAt: Type.String({ format: "date-time" }),
 });
@@ -55,6 +63,7 @@ const UpdatePostBody = Type.Object({
     Type.Union([Type.String({ format: "uri" }), Type.Null()]),
   ),
   published: Type.Optional(Type.Boolean()),
+  tags: Type.Optional(Type.Array(Type.String({ minLength: 1, maxLength: 50 }))),
 });
 
 const PostIdParams = Type.Object({

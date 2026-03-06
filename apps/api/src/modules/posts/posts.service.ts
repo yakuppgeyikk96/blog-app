@@ -1,4 +1,5 @@
 import type { PostsRepository } from "./posts.repository";
+import type { TagsService } from "../tags/tags.service";
 import type {
   CreatePostInput,
   UpdatePostInput,
@@ -11,6 +12,7 @@ import { sanitizeContent } from "../../common/sanitize";
 
 interface PostsServiceDeps {
   postsRepository: PostsRepository;
+  tagsService: TagsService;
   httpErrors: {
     notFound: (message: string) => Error;
     forbidden: (message: string) => Error;
@@ -19,6 +21,7 @@ interface PostsServiceDeps {
 
 export function createPostsService({
   postsRepository,
+  tagsService,
   httpErrors,
 }: PostsServiceDeps) {
   function generateBaseSlug(title: string): string {
@@ -103,7 +106,8 @@ export function createPostsService({
         throw httpErrors.notFound("Post not found");
       }
 
-      return toPostResponseDto(post);
+      const tags = await tagsService.getTagsForPost(post.id);
+      return toPostResponseDto(post, tags);
     },
 
     async getBySlug(
@@ -119,7 +123,8 @@ export function createPostsService({
         throw httpErrors.notFound("Post not found");
       }
 
-      return toPostResponseDto(post);
+      const tags = await tagsService.getTagsForPost(post.id);
+      return toPostResponseDto(post, tags);
     },
 
     async list(
@@ -137,8 +142,13 @@ export function createPostsService({
         excludeAuthorId: userId,
       });
 
+      const postIds = items.map((p) => p.id);
+      const tagMap = await tagsService.getTagsForPosts(postIds);
+
       return {
-        items: items.map(toPostListItemDto),
+        items: items.map((item) =>
+          toPostListItemDto(item, tagMap.get(item.id) ?? []),
+        ),
         pagination: {
           total,
           page: clampedPage,
@@ -163,8 +173,13 @@ export function createPostsService({
         limit: clampedLimit,
       });
 
+      const postIds = items.map((p) => p.id);
+      const tagMap = await tagsService.getTagsForPosts(postIds);
+
       return {
-        items: items.map(toPostListItemDto),
+        items: items.map((item) =>
+          toPostListItemDto(item, tagMap.get(item.id) ?? []),
+        ),
         pagination: {
           total,
           page: clampedPage,
@@ -212,12 +227,17 @@ export function createPostsService({
 
       await postsRepository.update(id, updateData);
 
+      if (input.tags !== undefined) {
+        await tagsService.syncPostTags(id, input.tags);
+      }
+
       const updated = await postsRepository.findByIdWithAuthor(id);
       if (!updated) {
         throw httpErrors.notFound("Post not found");
       }
 
-      return toPostResponseDto(updated);
+      const tags = await tagsService.getTagsForPost(id);
+      return toPostResponseDto(updated, tags);
     },
 
     async delete(id: string, userId: string): Promise<void> {
