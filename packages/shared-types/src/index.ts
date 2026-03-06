@@ -11,3 +11,4 @@ export type {
   CreatePostInput,
   UpdatePostInput,
 } from "./post.js";
+export type { TagDto } from "./tag.js";
