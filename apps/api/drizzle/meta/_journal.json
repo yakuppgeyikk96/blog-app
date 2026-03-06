@@ -15,6 +15,13 @@
       "when": 1772352502932,
       "tag": "0001_happy_doctor_faustus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1772795497919,
+      "tag": "0002_powerful_black_cat",
+      "breakpoints": true
     }
   ]
 }
