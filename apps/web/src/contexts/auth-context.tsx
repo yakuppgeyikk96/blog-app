@@ -7,6 +7,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useRouter } from "next/navigation";
 import type { UserResponseDto, AuthResponse } from "@repo/shared-types";
 import { api, ApiError } from "@/lib/api";
 
@@ -20,6 +21,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<UserResponseDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -37,7 +39,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     await api("/auth/logout", { method: "POST" });
     setUser(null);
-  }, []);
+    router.push("/");
+  }, [router]);
 
   return (
     <AuthContext value={{ user, isLoading, setUser, logout }}>
