@@ -61,7 +61,7 @@ export function createUploadsService({
         }),
       );
 
-      const url = `${s3PublicEndpoint}/${s3Bucket}/${key}`;
+      const url = `${s3PublicEndpoint}/${key}`;
 
       return { url };
     },
