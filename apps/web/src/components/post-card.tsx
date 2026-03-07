@@ -20,7 +20,7 @@ export function PostCard({ post }: PostCardProps) {
           alt={post.title}
           width={600}
           height={340}
-          unoptimized
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="aspect-video w-full object-cover"
         />
       )}
