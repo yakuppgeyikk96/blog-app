@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { fetchPostBySlug } from "@/app/actions";
 import { formatDate } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
@@ -65,9 +66,11 @@ export default async function PostPage({ params }: PostPageProps) {
         {post.tags.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {post.tags.map((tag) => (
-              <Badge key={tag.id} variant="secondary">
-                {tag.name}
-              </Badge>
+              <Link key={tag.id} href={`/?tag=${tag.slug}`}>
+                <Badge variant="secondary" className="hover:bg-secondary/80">
+                  {tag.name}
+                </Badge>
+              </Link>
             ))}
           </div>
         )}

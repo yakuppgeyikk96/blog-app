@@ -9,9 +9,16 @@ import { serverApi } from "@/lib/server-api";
 export async function fetchPublishedPosts(
   page = 1,
   limit = 12,
+  tag?: string,
 ) {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+  if (tag) params.set("tag", tag);
+
   return serverApi<PaginatedApiResponse<PostListItemDto>>(
-    `/posts?page=${page}&limit=${limit}`,
+    `/posts?${params.toString()}`,
   );
 }
 
