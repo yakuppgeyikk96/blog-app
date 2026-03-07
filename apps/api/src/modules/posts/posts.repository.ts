@@ -1,6 +1,6 @@
-import { and, count, desc, eq, ne, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, ne, sql } from "drizzle-orm";
 import type { DbType } from "../../db/connection";
-import { posts } from "../../db/schema/index";
+import { posts, tags, postTags } from "../../db/schema/index";
 import { users } from "../../db/schema/index";
 
 export type Post = typeof posts.$inferSelect;
@@ -77,11 +77,22 @@ export function createPostsRepository(db: DbType) {
       offset: number;
       limit: number;
       excludeAuthorId?: string;
+      tagSlug?: string;
     }): Promise<{ items: PostWithAuthor[]; total: number }> {
       const conditions = [eq(posts.published, true)];
 
       if (options.excludeAuthorId) {
         conditions.push(ne(posts.authorId, options.excludeAuthorId));
+      }
+
+      if (options.tagSlug) {
+        const postIdsWithTag = db
+          .select({ postId: postTags.postId })
+          .from(postTags)
+          .innerJoin(tags, eq(postTags.tagId, tags.id))
+          .where(eq(tags.slug, options.tagSlug));
+
+        conditions.push(inArray(posts.id, postIdsWithTag));
       }
 
       const whereClause = and(...conditions);

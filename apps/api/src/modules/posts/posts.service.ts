@@ -158,9 +158,10 @@ export function createPostsService({
       page: number,
       limit: number,
       userId?: string,
+      tagSlug?: string,
     ): Promise<{ items: PostListItemDto[]; pagination: Pagination }> {
       return paginateWithTags(page, limit, (opts) =>
-        postsRepository.findMany({ ...opts, excludeAuthorId: userId }),
+        postsRepository.findMany({ ...opts, excludeAuthorId: userId, tagSlug }),
       );
     },
 

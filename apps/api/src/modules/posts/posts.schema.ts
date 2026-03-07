@@ -77,6 +77,7 @@ const PostSlugParams = Type.Object({
 const ListPostsQuerystring = Type.Object({
   page: Type.Optional(Type.Integer({ minimum: 1, default: 1 })),
   limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 50, default: 10 })),
+  tag: Type.Optional(Type.String({ minLength: 1 })),
 });
 
 const SuccessPostResponse = Type.Object({
