@@ -3,6 +3,17 @@ import type { DbType } from "../../db/connection";
 import { posts, tags, postTags } from "../../db/schema/index";
 import { users } from "../../db/schema/index";
 
+function toTsqueryInput(input: string): string {
+  return input
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word.replace(/[^a-zA-Z0-9\u00C0-\u024F\u0400-\u04FF]/g, ""))
+    .filter(Boolean)
+    .map((word) => `${word}:*`)
+    .join(" & ");
+}
+
 export type Post = typeof posts.$inferSelect;
 export type NewPost = typeof posts.$inferInsert;
 
@@ -99,7 +110,7 @@ export function createPostsRepository(db: DbType) {
       }
 
       const searchQuery = options.q
-        ? sql`plainto_tsquery('simple', ${options.q})`
+        ? sql`to_tsquery('simple', ${toTsqueryInput(options.q)})`
         : null;
 
       if (searchQuery) {
