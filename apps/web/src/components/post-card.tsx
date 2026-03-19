@@ -19,9 +19,8 @@ export function PostCard({ post }: PostCardProps) {
           <BlurImage
             src={post.coverImage}
             alt={post.title}
-            width={384}
-            height={216}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 384px, 384px"
+            width={600}
+            height={340}
             className="aspect-video w-full object-cover"
           />
         </div>

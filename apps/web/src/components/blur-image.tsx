@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image, { type ImageProps } from "next/image";
 import { cn } from "@/lib/utils";
 
-export function BlurImage({ className, alt, quality = 70, ...props }: ImageProps) {
+export function BlurImage({ className, alt, ...props }: ImageProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   const isFill = props.fill === true;
@@ -22,7 +22,6 @@ export function BlurImage({ className, alt, quality = 70, ...props }: ImageProps
       <Image
         {...props}
         alt={alt}
-        quality={quality}
         className={cn(
           "transition-opacity duration-300",
           isLoading ? "opacity-0" : "opacity-100",
