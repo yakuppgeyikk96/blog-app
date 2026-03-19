@@ -47,8 +47,8 @@ export function createPostsHandler(postsService: PostsService) {
       request: FastifyRequest<{ Querystring: ListPostsQuerystringType }>,
       reply: FastifyReply,
     ) {
-      const { page = 1, limit = 10, tag } = request.query;
-      const result = await postsService.list(page, limit, request.user?.id, tag);
+      const { page = 1, limit = 10, tag, q } = request.query;
+      const result = await postsService.list(page, limit, request.user?.id, tag, q);
 
       return reply.status(200).send({ success: true, data: result });
     },

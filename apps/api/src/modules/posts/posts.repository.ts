@@ -6,7 +6,9 @@ import { users } from "../../db/schema/index";
 export type Post = typeof posts.$inferSelect;
 export type NewPost = typeof posts.$inferInsert;
 
-export type PostWithAuthor = Post & { authorName: string };
+export type PostWithAuthor = Omit<Post, "searchVector"> & {
+  authorName: string;
+};
 
 export function createPostsRepository(db: DbType) {
   const postWithAuthorColumns = {
@@ -78,6 +80,7 @@ export function createPostsRepository(db: DbType) {
       limit: number;
       excludeAuthorId?: string;
       tagSlug?: string;
+      q?: string;
     }): Promise<{ items: PostWithAuthor[]; total: number }> {
       const conditions = [eq(posts.published, true)];
 
@@ -95,14 +98,28 @@ export function createPostsRepository(db: DbType) {
         conditions.push(inArray(posts.id, postIdsWithTag));
       }
 
+      const searchQuery = options.q
+        ? sql`plainto_tsquery('simple', ${options.q})`
+        : null;
+
+      if (searchQuery) {
+        conditions.push(
+          sql`${posts.searchVector} @@ ${searchQuery}`,
+        );
+      }
+
       const whereClause = and(...conditions);
+
+      const orderBy = searchQuery
+        ? [sql`ts_rank(${posts.searchVector}, ${searchQuery}) DESC`, desc(posts.createdAt)]
+        : [desc(posts.createdAt)];
 
       const items = await db
         .select(postWithAuthorColumns)
         .from(posts)
         .innerJoin(users, eq(posts.authorId, users.id))
         .where(whereClause)
-        .orderBy(desc(posts.createdAt))
+        .orderBy(...orderBy)
         .limit(options.limit)
         .offset(options.offset);
 
