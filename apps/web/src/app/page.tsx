@@ -2,21 +2,22 @@ import Link from "next/link";
 import { X } from "lucide-react";
 import { PostCard } from "@/components/post-card";
 import { Badge } from "@/components/ui/badge";
+import { SearchInput } from "@/components/search-input";
 import { fetchPublishedPosts } from "./actions";
 
 interface HomeProps {
-  searchParams: Promise<{ page?: string; tag?: string }>;
+  searchParams: Promise<{ page?: string; tag?: string; q?: string }>;
 }
 
 export default async function Home({ searchParams }: HomeProps) {
-  const { page: pageParam, tag } = await searchParams;
+  const { page: pageParam, tag, q } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
 
   let data: Awaited<ReturnType<typeof fetchPublishedPosts>>["data"] | null =
     null;
 
   try {
-    const response = await fetchPublishedPosts(page, 12, tag);
+    const response = await fetchPublishedPosts(page, 12, tag, q);
     data = response.data;
   } catch {
     // Graceful fallback — show empty state on API failure
@@ -29,6 +30,7 @@ export default async function Home({ searchParams }: HomeProps) {
     const params = new URLSearchParams();
     if (p > 1) params.set("page", String(p));
     if (tag) params.set("tag", tag);
+    if (q) params.set("q", q);
     const qs = params.toString();
     return qs ? `/?${qs}` : "/";
   }
@@ -43,6 +45,8 @@ export default async function Home({ searchParams }: HomeProps) {
           Discover stories, ideas, and insights.
         </p>
       </section>
+
+      <SearchInput />
 
       {tag && (
         <div className="flex items-center justify-center gap-2">
@@ -90,7 +94,11 @@ export default async function Home({ searchParams }: HomeProps) {
         </>
       ) : (
         <p className="text-center text-muted-foreground">
-          {tag ? "No posts found with this tag." : "No posts published yet."}
+          {q
+            ? "No posts found matching your search."
+            : tag
+              ? "No posts found with this tag."
+              : "No posts published yet."}
         </p>
       )}
     </div>

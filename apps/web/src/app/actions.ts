@@ -10,12 +10,14 @@ export async function fetchPublishedPosts(
   page = 1,
   limit = 12,
   tag?: string,
+  q?: string,
 ) {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
   });
   if (tag) params.set("tag", tag);
+  if (q) params.set("q", q);
 
   return serverApi<PaginatedApiResponse<PostListItemDto>>(
     `/posts?${params.toString()}`,
