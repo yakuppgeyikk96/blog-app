@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { PostListItemDto } from "@repo/shared-types";
 import { formatDate } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
+import { BlurImage } from "@/components/blur-image";
 
 interface PostCardProps {
   post: PostListItemDto;
@@ -15,14 +15,16 @@ export function PostCard({ post }: PostCardProps) {
       className="group block overflow-hidden rounded-lg border bg-card transition-colors hover:border-foreground/20"
     >
       {post.coverImage && (
-        <Image
-          src={post.coverImage}
-          alt={post.title}
-          width={600}
-          height={340}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="aspect-video w-full object-cover"
-        />
+        <div className="relative overflow-hidden">
+          <BlurImage
+            src={post.coverImage}
+            alt={post.title}
+            width={384}
+            height={216}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 384px, 384px"
+            className="aspect-video w-full object-cover"
+          />
+        </div>
       )}
       <div className="p-4">
         <h2 className="line-clamp-2 text-lg font-semibold group-hover:underline">

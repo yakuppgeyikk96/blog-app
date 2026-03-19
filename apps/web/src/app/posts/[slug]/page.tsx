@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { fetchPostBySlug } from "@/app/actions";
 import { formatDate } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
+import { BlurImage } from "@/components/blur-image";
 
 export const revalidate = 3600;
 
@@ -43,7 +43,7 @@ export default async function PostPage({ params }: PostPageProps) {
     <article className="mx-auto max-w-3xl">
       {post.coverImage && (
         <div className="relative mb-8 aspect-2/1 w-full overflow-hidden rounded-lg">
-          <Image
+          <BlurImage
             src={post.coverImage}
             alt={post.title}
             fill
