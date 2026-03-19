@@ -22,6 +22,13 @@
       "when": 1772795497919,
       "tag": "0002_powerful_black_cat",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1774058400000,
+      "tag": "0003_add_search_vector",
+      "breakpoints": true
     }
   ]
 }
