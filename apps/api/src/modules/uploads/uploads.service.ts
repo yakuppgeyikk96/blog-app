@@ -1,6 +1,6 @@
 import { PutObjectCommand, type S3Client } from "@aws-sdk/client-s3";
 import { randomUUID } from "node:crypto";
-import { extname } from "node:path";
+import sharp from "sharp";
 
 interface UploadsServiceDeps {
   s3: S3Client;
@@ -18,14 +18,8 @@ const ALLOWED_MIME_TYPES = new Set([
   "image/gif",
 ]);
 
-const MIME_TO_EXT: Record<string, string> = {
-  "image/jpeg": ".jpg",
-  "image/png": ".png",
-  "image/webp": ".webp",
-  "image/gif": ".gif",
-};
-
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_WIDTH = 1200;
 
 export function createUploadsService({
   s3,
@@ -36,7 +30,7 @@ export function createUploadsService({
   return {
     async uploadImage(
       mimetype: string,
-      filename: string,
+      _filename: string,
       buffer: Buffer,
     ): Promise<{ url: string }> {
       if (!ALLOWED_MIME_TYPES.has(mimetype)) {
@@ -49,15 +43,33 @@ export function createUploadsService({
         throw httpErrors.badRequest("File size exceeds 5MB limit");
       }
 
-      const ext = MIME_TO_EXT[mimetype] ?? extname(filename);
+      const isGif = mimetype === "image/gif";
+
+      let optimizedBuffer: Buffer;
+      let contentType: string;
+      let ext: string;
+
+      if (isGif) {
+        optimizedBuffer = buffer;
+        contentType = "image/gif";
+        ext = ".gif";
+      } else {
+        optimizedBuffer = await sharp(buffer)
+          .resize({ width: MAX_WIDTH, withoutEnlargement: true })
+          .webp({ quality: 80 })
+          .toBuffer();
+        contentType = "image/webp";
+        ext = ".webp";
+      }
+
       const key = `covers/${randomUUID()}${ext}`;
 
       await s3.send(
         new PutObjectCommand({
           Bucket: s3Bucket,
           Key: key,
-          Body: buffer,
-          ContentType: mimetype,
+          Body: optimizedBuffer,
+          ContentType: contentType,
         }),
       );
 
