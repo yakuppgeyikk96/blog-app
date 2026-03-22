@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { HeaderNav } from "@/components/layout/header-nav";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Header() {
   return (
@@ -11,6 +12,7 @@ export function Header() {
         </Link>
 
         <nav className="flex items-center gap-2">
+          <ThemeToggle />
           <HeaderNav />
         </nav>
       </div>
