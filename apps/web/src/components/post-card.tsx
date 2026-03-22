@@ -3,6 +3,7 @@ import type { PostListItemDto } from "@repo/shared-types";
 import { formatDate } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { BlurImage } from "@/components/blur-image";
+import { InteractionButtons } from "@/components/interaction-buttons";
 
 interface PostCardProps {
   post: PostListItemDto;
@@ -41,10 +42,18 @@ export function PostCard({ post }: PostCardProps) {
             ))}
           </div>
         )}
-        <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-          <span>{post.author.name}</span>
-          <span>&middot;</span>
-          <span>{formatDate(post.createdAt)}</span>
+        <div className="mt-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span>{post.author.name}</span>
+            <span>&middot;</span>
+            <span>{formatDate(post.createdAt)}</span>
+          </div>
+          <InteractionButtons
+            postId={post.id}
+            likeCount={post.likeCount}
+            liked={post.liked}
+            bookmarked={post.bookmarked}
+          />
         </div>
       </div>
     </Link>

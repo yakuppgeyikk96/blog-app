@@ -16,6 +16,9 @@ interface AuthContextValue {
   isLoading: boolean;
   setUser: (user: UserResponseDto | null) => void;
   logout: () => Promise<void>;
+  authModalOpen: boolean;
+  setAuthModalOpen: (open: boolean) => void;
+  openAuthModal: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -24,6 +27,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<UserResponseDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
+  const openAuthModal = useCallback(() => setAuthModalOpen(true), []);
 
   useEffect(() => {
     api<{ success: true; data: AuthResponse }>("/auth/me")
@@ -43,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   return (
-    <AuthContext value={{ user, isLoading, setUser, logout }}>
+    <AuthContext value={{ user, isLoading, setUser, logout, authModalOpen, setAuthModalOpen, openAuthModal }}>
       {children}
     </AuthContext>
   );

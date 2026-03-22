@@ -5,6 +5,7 @@ import { fetchPostBySlug } from "@/app/actions";
 import { formatDate } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { BlurImage } from "@/components/blur-image";
+import { InteractionButtons } from "@/components/interaction-buttons";
 
 export const revalidate = 3600;
 
@@ -55,12 +56,20 @@ export default async function PostPage({ params }: PostPageProps) {
 
       <header className="mb-8">
         <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
-        <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-          <span>{post.author.name}</span>
-          <span>&middot;</span>
-          <time dateTime={String(post.createdAt)}>
-            {formatDate(post.createdAt)}
-          </time>
+        <div className="mt-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>{post.author.name}</span>
+            <span>&middot;</span>
+            <time dateTime={String(post.createdAt)}>
+              {formatDate(post.createdAt)}
+            </time>
+          </div>
+          <InteractionButtons
+            postId={post.id}
+            likeCount={post.likeCount}
+            liked={post.liked}
+            bookmarked={post.bookmarked}
+          />
         </div>
         {post.tags.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
