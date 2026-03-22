@@ -2,9 +2,22 @@ import type { PostWithAuthor } from "./posts.repository";
 import type { PostResponseDto, PostListItemDto } from "./posts.types";
 import type { TagDto } from "@repo/shared-types";
 
+interface InteractionData {
+  likeCount: number;
+  liked: boolean;
+  bookmarked: boolean;
+}
+
+const DEFAULT_INTERACTION: InteractionData = {
+  likeCount: 0,
+  liked: false,
+  bookmarked: false,
+};
+
 export function toPostResponseDto(
   post: PostWithAuthor,
   tags: TagDto[] = [],
+  interaction: InteractionData = DEFAULT_INTERACTION,
 ): PostResponseDto {
   return {
     id: post.id,
@@ -19,6 +32,9 @@ export function toPostResponseDto(
       name: post.authorName,
     },
     tags,
+    likeCount: interaction.likeCount,
+    liked: interaction.liked,
+    bookmarked: interaction.bookmarked,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
   };
@@ -27,6 +43,7 @@ export function toPostResponseDto(
 export function toPostListItemDto(
   post: PostWithAuthor,
   tags: TagDto[] = [],
+  interaction: InteractionData = DEFAULT_INTERACTION,
 ): PostListItemDto {
   return {
     id: post.id,
@@ -40,6 +57,9 @@ export function toPostListItemDto(
       name: post.authorName,
     },
     tags,
+    likeCount: interaction.likeCount,
+    liked: interaction.liked,
+    bookmarked: interaction.bookmarked,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
   };

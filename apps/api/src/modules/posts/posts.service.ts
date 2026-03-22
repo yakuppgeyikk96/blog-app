@@ -1,5 +1,6 @@
 import type { PostsRepository, PostWithAuthor } from "./posts.repository";
 import type { TagsService } from "../tags/tags.service";
+import type { InteractionsService } from "../interactions/interactions.service";
 import type {
   CreatePostInput,
   UpdatePostInput,
@@ -13,6 +14,7 @@ import { sanitizeContent } from "../../common/sanitize";
 interface PostsServiceDeps {
   postsRepository: PostsRepository;
   tagsService: TagsService;
+  interactionsService: InteractionsService;
   httpErrors: {
     notFound: (message: string) => Error;
     forbidden: (message: string) => Error;
@@ -22,6 +24,7 @@ interface PostsServiceDeps {
 export function createPostsService({
   postsRepository,
   tagsService,
+  interactionsService,
   httpErrors,
 }: PostsServiceDeps) {
   function generateBaseSlug(title: string): string {
@@ -68,9 +71,26 @@ export function createPostsService({
     }
   }
 
+  async function getInteractionData(postId: string, userId?: string) {
+    const [likeCounts, userInteractions] = await Promise.all([
+      interactionsService.getLikeCounts([postId]),
+      userId
+        ? interactionsService.getUserInteractions(userId, [postId])
+        : Promise.resolve(new Map()),
+    ]);
+
+    const interaction = userInteractions.get(postId);
+    return {
+      likeCount: likeCounts.get(postId) ?? 0,
+      liked: interaction?.liked ?? false,
+      bookmarked: interaction?.bookmarked ?? false,
+    };
+  }
+
   async function paginateWithTags(
     page: number,
     limit: number,
+    userId: string | undefined,
     fetchFn: (opts: { offset: number; limit: number }) => Promise<{ items: PostWithAuthor[]; total: number }>,
   ): Promise<{ items: PostListItemDto[]; pagination: Pagination }> {
     const clampedLimit = Math.min(Math.max(limit, 1), 50);
@@ -80,12 +100,23 @@ export function createPostsService({
     const { items, total } = await fetchFn({ offset, limit: clampedLimit });
 
     const postIds = items.map((p) => p.id);
-    const tagMap = await tagsService.getTagsForPosts(postIds);
+    const [tagMap, likeCounts, userInteractions] = await Promise.all([
+      tagsService.getTagsForPosts(postIds),
+      interactionsService.getLikeCounts(postIds),
+      userId
+        ? interactionsService.getUserInteractions(userId, postIds)
+        : Promise.resolve(new Map<string, { liked: boolean; bookmarked: boolean }>()),
+    ]);
 
     return {
-      items: items.map((item) =>
-        toPostListItemDto(item, tagMap.get(item.id) ?? []),
-      ),
+      items: items.map((item) => {
+        const interaction = userInteractions.get(item.id);
+        return toPostListItemDto(item, tagMap.get(item.id) ?? [], {
+          likeCount: likeCounts.get(item.id) ?? 0,
+          liked: interaction?.liked ?? false,
+          bookmarked: interaction?.bookmarked ?? false,
+        });
+      }),
       pagination: {
         total,
         page: clampedPage,
@@ -133,8 +164,11 @@ export function createPostsService({
         throw httpErrors.notFound("Post not found");
       }
 
-      const tags = await tagsService.getTagsForPost(post.id);
-      return toPostResponseDto(post, tags);
+      const [tags, interaction] = await Promise.all([
+        tagsService.getTagsForPost(post.id),
+        getInteractionData(post.id, userId),
+      ]);
+      return toPostResponseDto(post, tags, interaction);
     },
 
     async getBySlug(
@@ -150,8 +184,11 @@ export function createPostsService({
         throw httpErrors.notFound("Post not found");
       }
 
-      const tags = await tagsService.getTagsForPost(post.id);
-      return toPostResponseDto(post, tags);
+      const [tags, interaction] = await Promise.all([
+        tagsService.getTagsForPost(post.id),
+        getInteractionData(post.id, userId),
+      ]);
+      return toPostResponseDto(post, tags, interaction);
     },
 
     async list(
@@ -161,7 +198,7 @@ export function createPostsService({
       tagSlug?: string,
       q?: string,
     ): Promise<{ items: PostListItemDto[]; pagination: Pagination }> {
-      return paginateWithTags(page, limit, (opts) =>
+      return paginateWithTags(page, limit, userId, (opts) =>
         postsRepository.findMany({ ...opts, excludeAuthorId: userId, tagSlug, q }),
       );
     },
@@ -171,9 +208,50 @@ export function createPostsService({
       page: number,
       limit: number,
     ): Promise<{ items: PostListItemDto[]; pagination: Pagination }> {
-      return paginateWithTags(page, limit, (opts) =>
+      return paginateWithTags(page, limit, authorId, (opts) =>
         postsRepository.findByAuthor({ ...opts, authorId }),
       );
+    },
+
+    async listBookmarked(
+      userId: string,
+      page: number,
+      limit: number,
+    ): Promise<{ items: PostListItemDto[]; pagination: Pagination }> {
+      const clampedLimit = Math.min(Math.max(limit, 1), 50);
+      const clampedPage = Math.max(page, 1);
+      const offset = (clampedPage - 1) * clampedLimit;
+
+      const { postIds, total } = await interactionsService.getBookmarkedPostIds(
+        userId,
+        offset,
+        clampedLimit,
+      );
+
+      const items = await postsRepository.findByIds(postIds);
+
+      const [tagMap, likeCounts, userInteractions] = await Promise.all([
+        tagsService.getTagsForPosts(postIds),
+        interactionsService.getLikeCounts(postIds),
+        interactionsService.getUserInteractions(userId, postIds),
+      ]);
+
+      return {
+        items: items.map((item) => {
+          const interaction = userInteractions.get(item.id);
+          return toPostListItemDto(item, tagMap.get(item.id) ?? [], {
+            likeCount: likeCounts.get(item.id) ?? 0,
+            liked: interaction?.liked ?? false,
+            bookmarked: interaction?.bookmarked ?? false,
+          });
+        }),
+        pagination: {
+          total,
+          page: clampedPage,
+          limit: clampedLimit,
+          totalPages: Math.ceil(total / clampedLimit),
+        },
+      };
     },
 
     async update(

@@ -21,6 +21,9 @@ const PostResponseSchema = Type.Object({
   published: Type.Boolean(),
   author: AuthorSchema,
   tags: Type.Array(TagSchema),
+  likeCount: Type.Integer(),
+  liked: Type.Boolean(),
+  bookmarked: Type.Boolean(),
   createdAt: Type.String({ format: "date-time" }),
   updatedAt: Type.String({ format: "date-time" }),
 });
@@ -34,6 +37,9 @@ const PostListItemSchema = Type.Object({
   published: Type.Boolean(),
   author: AuthorSchema,
   tags: Type.Array(TagSchema),
+  likeCount: Type.Integer(),
+  liked: Type.Boolean(),
+  bookmarked: Type.Boolean(),
   createdAt: Type.String({ format: "date-time" }),
   updatedAt: Type.String({ format: "date-time" }),
 });

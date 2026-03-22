@@ -37,6 +37,19 @@ export function createPostsRepository(db: DbType) {
   };
 
   return {
+    async findByIds(ids: string[]): Promise<PostWithAuthor[]> {
+      if (ids.length === 0) return [];
+
+      const items = await db
+        .select(postWithAuthorColumns)
+        .from(posts)
+        .innerJoin(users, eq(posts.authorId, users.id))
+        .where(inArray(posts.id, ids));
+
+      const orderMap = new Map(ids.map((id, i) => [id, i]));
+      return items.sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0));
+    },
+
     async findById(id: string): Promise<Post | undefined> {
       const result = await db
         .select()

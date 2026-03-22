@@ -12,22 +12,41 @@ import {
 } from "../../modules/posts/posts.schema.js";
 import { createTagsRepository } from "../../modules/tags/tags.repository.js";
 import { createTagsService } from "../../modules/tags/tags.service.js";
+import { createInteractionsRepository } from "../../modules/interactions/interactions.repository.js";
+import { createInteractionsService } from "../../modules/interactions/interactions.service.js";
+import { createInteractionsHandler } from "../../modules/interactions/interactions.handler.js";
+import {
+  toggleLikeSchema,
+  toggleBookmarkSchema,
+} from "../../modules/interactions/interactions.schema.js";
 
 const postsRoutes: FastifyPluginAsync = async (fastify) => {
   const postsRepository = createPostsRepository(fastify.db);
   const tagsRepository = createTagsRepository(fastify.db);
   const tagsService = createTagsService({ tagsRepository });
+  const interactionsRepository = createInteractionsRepository(fastify.db);
+  const interactionsService = createInteractionsService({
+    interactionsRepository,
+  });
 
   const postsService = createPostsService({
     postsRepository,
     tagsService,
+    interactionsService,
     httpErrors: fastify.httpErrors,
   });
 
   const handler = createPostsHandler(postsService);
+  const interactionsHandler = createInteractionsHandler(interactionsService);
 
-  // Public routes
-  fastify.get("/", { schema: listPostsSchema }, handler.listPostsHandler);
+  // Public routes (with optional auth for like/bookmark status)
+  fastify.route({
+    method: "GET",
+    url: "/",
+    schema: listPostsSchema,
+    onRequest: [fastify.optionalAuthenticate],
+    handler: handler.listPostsHandler,
+  });
   fastify.route({
     method: "GET",
     url: "/by-slug/:slug",
@@ -48,12 +67,24 @@ const postsRoutes: FastifyPluginAsync = async (fastify) => {
     scope.addHook("onRequest", fastify.authenticate);
 
     scope.get("/me", { schema: listPostsSchema }, handler.myPostsHandler);
+    scope.get("/bookmarks", { schema: listPostsSchema }, handler.bookmarkedPostsHandler);
     scope.post("/", { schema: createPostSchema }, handler.createPostHandler);
     scope.put("/:id", { schema: updatePostSchema }, handler.updatePostHandler);
     scope.delete(
       "/:id",
       { schema: deletePostSchema },
       handler.deletePostHandler,
+    );
+
+    scope.post(
+      "/:id/like",
+      { schema: toggleLikeSchema },
+      interactionsHandler.toggleLikeHandler,
+    );
+    scope.post(
+      "/:id/bookmark",
+      { schema: toggleBookmarkSchema },
+      interactionsHandler.toggleBookmarkHandler,
     );
   });
 };

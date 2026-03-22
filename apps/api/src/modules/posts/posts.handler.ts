@@ -67,6 +67,20 @@ export function createPostsHandler(postsService: PostsService) {
       return reply.status(200).send({ success: true, data: result });
     },
 
+    async bookmarkedPostsHandler(
+      request: FastifyRequest<{ Querystring: ListPostsQuerystringType }>,
+      reply: FastifyReply,
+    ) {
+      const { page = 1, limit = 10 } = request.query;
+      const result = await postsService.listBookmarked(
+        request.user!.id,
+        page,
+        limit,
+      );
+
+      return reply.status(200).send({ success: true, data: result });
+    },
+
     async updatePostHandler(
       request: FastifyRequest<{
         Params: PostIdParamsType;
