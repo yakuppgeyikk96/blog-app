@@ -29,6 +29,13 @@
       "when": 1774058400000,
       "tag": "0003_add_search_vector",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1774037366975,
+      "tag": "0004_striped_iron_fist",
+      "breakpoints": true
     }
   ]
 }

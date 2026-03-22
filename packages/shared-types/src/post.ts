@@ -13,6 +13,9 @@ export interface PostResponseDto {
     name: string;
   };
   tags: TagDto[];
+  likeCount: number;
+  liked: boolean;
+  bookmarked: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +32,9 @@ export interface PostListItemDto {
     name: string;
   };
   tags: TagDto[];
+  likeCount: number;
+  liked: boolean;
+  bookmarked: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
