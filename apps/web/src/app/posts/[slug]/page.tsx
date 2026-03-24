@@ -58,7 +58,12 @@ export default async function PostPage({ params }: PostPageProps) {
         <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
         <div className="mt-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>{post.author.name}</span>
+            <Link
+              href={`/authors/${post.author.slug}`}
+              className="hover:underline"
+            >
+              {post.author.name}
+            </Link>
             <span>&middot;</span>
             <time dateTime={String(post.createdAt)}>
               {formatDate(post.createdAt)}

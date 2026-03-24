@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { FileText, LogOut } from "lucide-react";
+import { Bookmark, FileText, LogOut, User } from "lucide-react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 interface ProfileDropdownProps {
-  user: { name: string; email: string };
+  user: { name: string; email: string; avatar?: string | null };
   onLogout: () => void;
 }
 
@@ -34,6 +34,7 @@ export function ProfileDropdown({ user, onLogout }: ProfileDropdownProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full">
           <Avatar size="sm">
+            {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}
             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
           </Avatar>
         </Button>
@@ -48,6 +49,18 @@ export function ProfileDropdown({ user, onLogout }: ProfileDropdownProps) {
           <Link href="/dashboard/posts">
             <FileText className="size-4" />
             My Posts
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard/bookmarks">
+            <Bookmark className="size-4" />
+            Bookmarks
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard/profile">
+            <User className="size-4" />
+            Profile
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

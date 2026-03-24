@@ -11,12 +11,9 @@ interface PostCardProps {
 
 export function PostCard({ post }: PostCardProps) {
   return (
-    <Link
-      href={`/posts/${post.slug}`}
-      className="group block overflow-hidden rounded-lg border bg-card transition-colors hover:border-foreground/20"
-    >
+    <article className="group overflow-hidden rounded-lg border bg-card transition-colors hover:border-foreground/20">
       {post.coverImage && (
-        <div className="relative overflow-hidden">
+        <Link href={`/posts/${post.slug}`} className="relative block overflow-hidden">
           <BlurImage
             src={post.coverImage}
             alt={post.title}
@@ -24,12 +21,14 @@ export function PostCard({ post }: PostCardProps) {
             height={340}
             className="aspect-video w-full object-cover"
           />
-        </div>
+        </Link>
       )}
       <div className="p-4">
-        <h2 className="line-clamp-2 text-lg font-semibold group-hover:underline">
-          {post.title}
-        </h2>
+        <Link href={`/posts/${post.slug}`}>
+          <h2 className="line-clamp-2 text-lg font-semibold group-hover:underline">
+            {post.title}
+          </h2>
+        </Link>
         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
           {post.summary ?? "No summary available"}
         </p>
@@ -44,7 +43,12 @@ export function PostCard({ post }: PostCardProps) {
         )}
         <div className="mt-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>{post.author.name}</span>
+            <Link
+              href={`/authors/${post.author.slug}`}
+              className="hover:underline"
+            >
+              {post.author.name}
+            </Link>
             <span>&middot;</span>
             <span>{formatDate(post.createdAt)}</span>
           </div>
@@ -56,6 +60,6 @@ export function PostCard({ post }: PostCardProps) {
           />
         </div>
       </div>
-    </Link>
+    </article>
   );
 }

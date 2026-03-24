@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, Bookmark } from "lucide-react";
+import { FileText, Bookmark, User } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const sidebarLinks = [
   { href: "/dashboard/posts", label: "My Posts", icon: FileText },
   { href: "/dashboard/bookmarks", label: "Bookmarks", icon: Bookmark },
+  { href: "/dashboard/profile", label: "Profile", icon: User },
 ];
 
 export function DashboardSidebar() {
