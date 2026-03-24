@@ -2,7 +2,8 @@
 
 import { useState, useRef } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
+import { getInitials } from "@/lib/format";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,15 +12,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import type { UserResponseDto } from "@repo/shared-types";
 import { Camera } from "lucide-react";
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 export default function ProfilePage() {
   const { user, setUser } = useAuth();
@@ -76,7 +68,7 @@ export default function ProfilePage() {
       toast.success("Profile updated");
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Failed to update profile",
+        err instanceof ApiError ? err.message : "Failed to update profile",
       );
     } finally {
       setSaving(false);

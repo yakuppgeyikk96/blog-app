@@ -6,6 +6,7 @@ import type {
   UpdateProfileInput,
 } from "@repo/shared-types";
 import { toUserResponseDto, toAuthorProfileDto } from "./users.mapper";
+import { generateBaseSlug } from "../../common/slug";
 
 interface UsersServiceDeps {
   usersRepository: UsersRepository;
@@ -25,36 +26,6 @@ export function createUsersService({
   uploadsService,
   httpErrors,
 }: UsersServiceDeps) {
-  function generateBaseSlug(name: string): string {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "");
-  }
-
-  async function generateUniqueSlug(
-    name: string,
-    excludeUserId?: string,
-  ): Promise<string> {
-    const baseSlug = generateBaseSlug(name);
-    const existingSlugs = await usersRepository.findSlugStartingWith(
-      baseSlug,
-      excludeUserId,
-    );
-
-    if (existingSlugs.length === 0) return baseSlug;
-
-    const slugSet = new Set(existingSlugs.map((r) => r.slug));
-    if (!slugSet.has(baseSlug)) return baseSlug;
-
-    let suffix = 1;
-    while (slugSet.has(`${baseSlug}-${suffix}`)) suffix++;
-    return `${baseSlug}-${suffix}`;
-  }
-
   return {
     async getProfile(userId: string): Promise<UserResponseDto> {
       const user = await usersRepository.findById(userId);

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PostCard } from "@/components/post-card";
-import { formatDate } from "@/lib/format";
+import { formatDate, getInitials } from "@/lib/format";
 import { fetchAuthorProfile, fetchAuthorPosts } from "./actions";
 
 interface AuthorPageProps {
@@ -26,15 +26,6 @@ export async function generateMetadata({
   } catch {
     return { title: "Author Not Found" };
   }
-}
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
 }
 
 export default async function AuthorPage({

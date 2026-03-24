@@ -10,6 +10,7 @@ import type {
 } from "./posts.types";
 import { toPostResponseDto, toPostListItemDto } from "./posts.mapper";
 import { sanitizeContent } from "../../common/sanitize";
+import { generateUniqueSlug } from "../../common/slug.js";
 
 interface PostsServiceDeps {
   postsRepository: PostsRepository;
@@ -27,42 +28,10 @@ export function createPostsService({
   interactionsService,
   httpErrors,
 }: PostsServiceDeps) {
-  function generateBaseSlug(title: string): string {
-    return title
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "");
-  }
-
-  async function generateUniqueSlug(
-    title: string,
-    excludePostId?: string,
-  ): Promise<string> {
-    const baseSlug = generateBaseSlug(title);
-    const existingSlugs = await postsRepository.findSlugStartingWith(
-      baseSlug,
-      excludePostId,
+  function makePostSlug(title: string, excludePostId?: string) {
+    return generateUniqueSlug(title, (baseSlug) =>
+      postsRepository.findSlugStartingWith(baseSlug, excludePostId),
     );
-
-    if (existingSlugs.length === 0) {
-      return baseSlug;
-    }
-
-    const slugSet = new Set(existingSlugs.map((r) => r.slug));
-
-    if (!slugSet.has(baseSlug)) {
-      return baseSlug;
-    }
-
-    let suffix = 1;
-    while (slugSet.has(`${baseSlug}-${suffix}`)) {
-      suffix++;
-    }
-
-    return `${baseSlug}-${suffix}`;
   }
 
   function assertOwnership(postAuthorId: string, userId: string): void {
@@ -131,7 +100,7 @@ export function createPostsService({
       input: CreatePostInput,
       authorId: string,
     ): Promise<PostResponseDto> {
-      const slug = await generateUniqueSlug(input.title);
+      const slug = await makePostSlug(input.title);
 
       const post = await postsRepository.create({
         title: input.title,
@@ -278,7 +247,7 @@ export function createPostsService({
       const isPublishing = input.published === true && !existing.published;
       if (isPublishing) {
         const currentTitle = input.title ?? existing.title;
-        updateData.slug = await generateUniqueSlug(currentTitle, id);
+        updateData.slug = await makePostSlug(currentTitle, id);
       }
 
       if (input.title !== undefined) {

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Bookmark, FileText, LogOut, User } from "lucide-react";
 
+import { getInitials } from "@/lib/format";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -17,15 +18,6 @@ import { Button } from "@/components/ui/button";
 interface ProfileDropdownProps {
   user: { name: string; email: string; avatar?: string | null };
   onLogout: () => void;
-}
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
 }
 
 export function ProfileDropdown({ user, onLogout }: ProfileDropdownProps) {

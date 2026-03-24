@@ -7,6 +7,7 @@ import type {
   UserResponseDto,
 } from "./auth.types";
 import { toUserResponseDto } from "./auth.mapper";
+import { generateUniqueSlug } from "../../common/slug";
 
 export interface AuthServiceResult {
   user: UserResponseDto;
@@ -27,30 +28,6 @@ export function createAuthService({
   jwtSign,
   httpErrors,
 }: AuthServiceDeps) {
-  function generateBaseSlug(name: string): string {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "");
-  }
-
-  async function generateUniqueSlug(name: string): Promise<string> {
-    const baseSlug = generateBaseSlug(name);
-    const existingSlugs = await authRepository.findSlugStartingWith(baseSlug);
-
-    if (existingSlugs.length === 0) return baseSlug;
-
-    const slugSet = new Set(existingSlugs.map((r) => r.slug));
-    if (!slugSet.has(baseSlug)) return baseSlug;
-
-    let suffix = 1;
-    while (slugSet.has(`${baseSlug}-${suffix}`)) suffix++;
-    return `${baseSlug}-${suffix}`;
-  }
-
   return {
     async register(input: RegisterInput): Promise<AuthServiceResult> {
       const existing = await authRepository.findByEmail(input.email);
@@ -59,7 +36,10 @@ export function createAuthService({
       }
 
       const passwordHash = await argon2.hash(input.password);
-      const slug = await generateUniqueSlug(input.name);
+      const slug = await generateUniqueSlug(
+        input.name,
+        (baseSlug) => authRepository.findSlugStartingWith(baseSlug),
+      );
 
       const user = await authRepository.create({
         email: input.email,
