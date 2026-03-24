@@ -4,6 +4,8 @@ export type {
   RegisterInput,
   LoginInput,
   AuthResponse,
+  AuthorProfileDto,
+  UpdateProfileInput,
 } from "./auth.js";
 export type {
   PostResponseDto,

@@ -11,6 +11,8 @@ export interface PostResponseDto {
   author: {
     id: string;
     name: string;
+    slug: string;
+    avatar: string | null;
   };
   tags: TagDto[];
   likeCount: number;
@@ -30,6 +32,8 @@ export interface PostListItemDto {
   author: {
     id: string;
     name: string;
+    slug: string;
+    avatar: string | null;
   };
   tags: TagDto[];
   likeCount: number;
