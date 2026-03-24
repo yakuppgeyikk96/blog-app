@@ -19,6 +19,8 @@ export type NewPost = typeof posts.$inferInsert;
 
 export type PostWithAuthor = Omit<Post, "searchVector"> & {
   authorName: string;
+  authorSlug: string | null;
+  authorAvatar: string | null;
 };
 
 export function createPostsRepository(db: DbType) {
@@ -34,6 +36,8 @@ export function createPostsRepository(db: DbType) {
     createdAt: posts.createdAt,
     updatedAt: posts.updatedAt,
     authorName: users.name,
+    authorSlug: users.slug,
+    authorAvatar: users.avatar,
   };
 
   return {
@@ -103,12 +107,15 @@ export function createPostsRepository(db: DbType) {
       offset: number;
       limit: number;
       excludeAuthorId?: string;
+      authorId?: string;
       tagSlug?: string;
       q?: string;
     }): Promise<{ items: PostWithAuthor[]; total: number }> {
       const conditions = [eq(posts.published, true)];
 
-      if (options.excludeAuthorId) {
+      if (options.authorId) {
+        conditions.push(eq(posts.authorId, options.authorId));
+      } else if (options.excludeAuthorId) {
         conditions.push(ne(posts.authorId, options.excludeAuthorId));
       }
 

@@ -3,6 +3,8 @@ import { Type, type Static } from "@sinclair/typebox";
 const AuthorSchema = Type.Object({
   id: Type.String(),
   name: Type.String(),
+  slug: Type.String(),
+  avatar: Type.Union([Type.String(), Type.Null()]),
 });
 
 const TagSchema = Type.Object({
@@ -85,6 +87,7 @@ const ListPostsQuerystring = Type.Object({
   limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 50, default: 10 })),
   tag: Type.Optional(Type.String({ minLength: 1 })),
   q: Type.Optional(Type.String({ minLength: 1, maxLength: 200 })),
+  authorId: Type.Optional(Type.String({ format: "uuid" })),
 });
 
 const SuccessPostResponse = Type.Object({

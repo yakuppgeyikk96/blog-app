@@ -32,6 +32,7 @@ export function createUploadsService({
       mimetype: string,
       _filename: string,
       buffer: Buffer,
+      options?: { prefix?: string; maxWidth?: number },
     ): Promise<{ url: string }> {
       if (!ALLOWED_MIME_TYPES.has(mimetype)) {
         throw httpErrors.badRequest(
@@ -43,6 +44,8 @@ export function createUploadsService({
         throw httpErrors.badRequest("File size exceeds 5MB limit");
       }
 
+      const prefix = options?.prefix ?? "covers";
+      const maxWidth = options?.maxWidth ?? MAX_WIDTH;
       const isGif = mimetype === "image/gif";
 
       let optimizedBuffer: Buffer;
@@ -55,14 +58,14 @@ export function createUploadsService({
         ext = ".gif";
       } else {
         optimizedBuffer = await sharp(buffer)
-          .resize({ width: MAX_WIDTH, withoutEnlargement: true })
+          .resize({ width: maxWidth, withoutEnlargement: true })
           .webp({ quality: 80 })
           .toBuffer();
         contentType = "image/webp";
         ext = ".webp";
       }
 
-      const key = `covers/${randomUUID()}${ext}`;
+      const key = `${prefix}/${randomUUID()}${ext}`;
 
       await s3.send(
         new PutObjectCommand({

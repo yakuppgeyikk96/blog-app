@@ -15,6 +15,10 @@ export default fp(async (fastify) => {
             id: users.id,
             email: users.email,
             name: users.name,
+            avatar: users.avatar,
+            bio: users.bio,
+            website: users.website,
+            slug: users.slug,
             createdAt: users.createdAt,
             updatedAt: users.updatedAt,
           })
@@ -44,6 +48,10 @@ export default fp(async (fastify) => {
             id: users.id,
             email: users.email,
             name: users.name,
+            avatar: users.avatar,
+            bio: users.bio,
+            website: users.website,
+            slug: users.slug,
             createdAt: users.createdAt,
             updatedAt: users.updatedAt,
           })
@@ -67,6 +75,10 @@ declare module "@fastify/jwt" {
       id: string;
       email: string;
       name: string;
+      avatar: string | null;
+      bio: string | null;
+      website: string | null;
+      slug: string | null;
       createdAt: Date;
       updatedAt: Date;
     };

@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { DbType } from "../../db/connection";
 import { users } from "../../db/schema/index";
 
@@ -7,6 +7,15 @@ export type NewUser = typeof users.$inferInsert;
 
 export function createAuthRepository(db: DbType) {
   return {
+    async findById(id: string): Promise<User | undefined> {
+      const result = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, id));
+
+      return result[0];
+    },
+
     async findByEmail(email: string): Promise<User | undefined> {
       const result = await db
         .select()
@@ -14,6 +23,15 @@ export function createAuthRepository(db: DbType) {
         .where(eq(users.email, email));
 
       return result[0];
+    },
+
+    async findSlugStartingWith(baseSlug: string): Promise<{ slug: string }[]> {
+      return db
+        .select({ slug: users.slug })
+        .from(users)
+        .where(
+          sql`${users.slug} = ${baseSlug} OR ${users.slug} LIKE ${baseSlug + "-%"}`,
+        ) as Promise<{ slug: string }[]>;
     },
 
     async create(data: NewUser): Promise<User> {

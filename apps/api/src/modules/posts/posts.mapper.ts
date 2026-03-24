@@ -30,6 +30,8 @@ export function toPostResponseDto(
     author: {
       id: post.authorId,
       name: post.authorName,
+      slug: post.authorSlug ?? "",
+      avatar: post.authorAvatar,
     },
     tags,
     likeCount: interaction.likeCount,
@@ -55,6 +57,8 @@ export function toPostListItemDto(
     author: {
       id: post.authorId,
       name: post.authorName,
+      slug: post.authorSlug ?? "",
+      avatar: post.authorAvatar,
     },
     tags,
     likeCount: interaction.likeCount,

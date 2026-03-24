@@ -197,9 +197,16 @@ export function createPostsService({
       userId?: string,
       tagSlug?: string,
       q?: string,
+      authorId?: string,
     ): Promise<{ items: PostListItemDto[]; pagination: Pagination }> {
       return paginateWithTags(page, limit, userId, (opts) =>
-        postsRepository.findMany({ ...opts, excludeAuthorId: userId, tagSlug, q }),
+        postsRepository.findMany({
+          ...opts,
+          excludeAuthorId: authorId ? undefined : userId,
+          authorId,
+          tagSlug,
+          q,
+        }),
       );
     },
 

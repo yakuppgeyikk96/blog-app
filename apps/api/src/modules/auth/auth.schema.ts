@@ -15,6 +15,10 @@ const UserResponseSchema = Type.Object({
   id: Type.String(),
   email: Type.String(),
   name: Type.String(),
+  avatar: Type.Union([Type.String(), Type.Null()]),
+  bio: Type.Union([Type.String(), Type.Null()]),
+  website: Type.Union([Type.String(), Type.Null()]),
+  slug: Type.String(),
   createdAt: Type.String({ format: "date-time" }),
   updatedAt: Type.String({ format: "date-time" }),
 });
