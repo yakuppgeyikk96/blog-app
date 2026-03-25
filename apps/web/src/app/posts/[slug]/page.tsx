@@ -6,6 +6,7 @@ import { formatDate } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { BlurImage } from "@/components/blur-image";
 import { InteractionButtons } from "@/components/interaction-buttons";
+import { CommentSection } from "@/components/comments/comment-section";
 
 export const revalidate = 3600;
 
@@ -93,6 +94,8 @@ export default async function PostPage({ params }: PostPageProps) {
         className="prose prose-neutral dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
+
+      <CommentSection postId={post.id} postAuthorId={post.author.id} />
     </article>
   );
 }

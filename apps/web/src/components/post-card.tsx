@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MessageSquare } from "lucide-react";
 import type { PostListItemDto } from "@repo/shared-types";
 import { formatDate } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
@@ -52,12 +53,21 @@ export function PostCard({ post }: PostCardProps) {
             <span>&middot;</span>
             <span>{formatDate(post.createdAt)}</span>
           </div>
-          <InteractionButtons
-            postId={post.id}
-            likeCount={post.likeCount}
-            liked={post.liked}
-            bookmarked={post.bookmarked}
-          />
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/posts/${post.slug}#comments`}
+              className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
+            >
+              <MessageSquare className="size-3.5" />
+              <span className="text-xs">{post.commentCount}</span>
+            </Link>
+            <InteractionButtons
+              postId={post.id}
+              likeCount={post.likeCount}
+              liked={post.liked}
+              bookmarked={post.bookmarked}
+            />
+          </div>
         </div>
       </div>
     </article>
