@@ -6,12 +6,14 @@ interface InteractionData {
   likeCount: number;
   liked: boolean;
   bookmarked: boolean;
+  commentCount: number;
 }
 
 const DEFAULT_INTERACTION: InteractionData = {
   likeCount: 0,
   liked: false,
   bookmarked: false,
+  commentCount: 0,
 };
 
 export function toPostResponseDto(
@@ -37,6 +39,7 @@ export function toPostResponseDto(
     likeCount: interaction.likeCount,
     liked: interaction.liked,
     bookmarked: interaction.bookmarked,
+    commentCount: interaction.commentCount,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
   };
@@ -64,6 +67,7 @@ export function toPostListItemDto(
     likeCount: interaction.likeCount,
     liked: interaction.liked,
     bookmarked: interaction.bookmarked,
+    commentCount: interaction.commentCount,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
   };

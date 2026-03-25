@@ -26,6 +26,7 @@ const PostResponseSchema = Type.Object({
   likeCount: Type.Integer(),
   liked: Type.Boolean(),
   bookmarked: Type.Boolean(),
+  commentCount: Type.Integer(),
   createdAt: Type.String({ format: "date-time" }),
   updatedAt: Type.String({ format: "date-time" }),
 });
@@ -42,6 +43,7 @@ const PostListItemSchema = Type.Object({
   likeCount: Type.Integer(),
   liked: Type.Boolean(),
   bookmarked: Type.Boolean(),
+  commentCount: Type.Integer(),
   createdAt: Type.String({ format: "date-time" }),
   updatedAt: Type.String({ format: "date-time" }),
 });

@@ -1,6 +1,7 @@
 import type { PostsRepository, PostWithAuthor } from "./posts.repository";
 import type { TagsService } from "../tags/tags.service";
 import type { InteractionsService } from "../interactions/interactions.service";
+import type { CommentsService } from "../comments/comments.service";
 import type {
   CreatePostInput,
   UpdatePostInput,
@@ -16,6 +17,7 @@ interface PostsServiceDeps {
   postsRepository: PostsRepository;
   tagsService: TagsService;
   interactionsService: InteractionsService;
+  commentsService: CommentsService;
   httpErrors: {
     notFound: (message: string) => Error;
     forbidden: (message: string) => Error;
@@ -26,6 +28,7 @@ export function createPostsService({
   postsRepository,
   tagsService,
   interactionsService,
+  commentsService,
   httpErrors,
 }: PostsServiceDeps) {
   function makePostSlug(title: string, excludePostId?: string) {
@@ -41,11 +44,12 @@ export function createPostsService({
   }
 
   async function getInteractionData(postId: string, userId?: string) {
-    const [likeCounts, userInteractions] = await Promise.all([
+    const [likeCounts, userInteractions, commentCounts] = await Promise.all([
       interactionsService.getLikeCounts([postId]),
       userId
         ? interactionsService.getUserInteractions(userId, [postId])
         : Promise.resolve(new Map()),
+      commentsService.getCommentCounts([postId]),
     ]);
 
     const interaction = userInteractions.get(postId);
@@ -53,6 +57,7 @@ export function createPostsService({
       likeCount: likeCounts.get(postId) ?? 0,
       liked: interaction?.liked ?? false,
       bookmarked: interaction?.bookmarked ?? false,
+      commentCount: commentCounts.get(postId) ?? 0,
     };
   }
 
@@ -69,12 +74,13 @@ export function createPostsService({
     const { items, total } = await fetchFn({ offset, limit: clampedLimit });
 
     const postIds = items.map((p) => p.id);
-    const [tagMap, likeCounts, userInteractions] = await Promise.all([
+    const [tagMap, likeCounts, userInteractions, commentCounts] = await Promise.all([
       tagsService.getTagsForPosts(postIds),
       interactionsService.getLikeCounts(postIds),
       userId
         ? interactionsService.getUserInteractions(userId, postIds)
         : Promise.resolve(new Map<string, { liked: boolean; bookmarked: boolean }>()),
+      commentsService.getCommentCounts(postIds),
     ]);
 
     return {
@@ -84,6 +90,7 @@ export function createPostsService({
           likeCount: likeCounts.get(item.id) ?? 0,
           liked: interaction?.liked ?? false,
           bookmarked: interaction?.bookmarked ?? false,
+          commentCount: commentCounts.get(item.id) ?? 0,
         });
       }),
       pagination: {
@@ -206,10 +213,11 @@ export function createPostsService({
 
       const items = await postsRepository.findByIds(postIds);
 
-      const [tagMap, likeCounts, userInteractions] = await Promise.all([
+      const [tagMap, likeCounts, userInteractions, commentCounts] = await Promise.all([
         tagsService.getTagsForPosts(postIds),
         interactionsService.getLikeCounts(postIds),
         interactionsService.getUserInteractions(userId, postIds),
+        commentsService.getCommentCounts(postIds),
       ]);
 
       return {
@@ -219,6 +227,7 @@ export function createPostsService({
             likeCount: likeCounts.get(item.id) ?? 0,
             liked: interaction?.liked ?? false,
             bookmarked: interaction?.bookmarked ?? false,
+            commentCount: commentCounts.get(item.id) ?? 0,
           });
         }),
         pagination: {

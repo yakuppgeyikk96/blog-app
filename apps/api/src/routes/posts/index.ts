@@ -19,6 +19,13 @@ import {
   toggleLikeSchema,
   toggleBookmarkSchema,
 } from "../../modules/interactions/interactions.schema.js";
+import { createCommentsRepository } from "../../modules/comments/comments.repository.js";
+import { createCommentsService } from "../../modules/comments/comments.service.js";
+import { createCommentsHandler } from "../../modules/comments/comments.handler.js";
+import {
+  listCommentsSchema,
+  createCommentSchema,
+} from "../../modules/comments/comments.schema.js";
 
 const postsRoutes: FastifyPluginAsync = async (fastify) => {
   const postsRepository = createPostsRepository(fastify.db);
@@ -29,15 +36,31 @@ const postsRoutes: FastifyPluginAsync = async (fastify) => {
     interactionsRepository,
   });
 
+  const commentsRepository = createCommentsRepository(fastify.db);
+  const commentsService = createCommentsService({
+    commentsRepository,
+    postsRepository,
+    httpErrors: fastify.httpErrors,
+  });
+
   const postsService = createPostsService({
     postsRepository,
     tagsService,
     interactionsService,
+    commentsService,
     httpErrors: fastify.httpErrors,
   });
 
   const handler = createPostsHandler(postsService);
   const interactionsHandler = createInteractionsHandler(interactionsService);
+  const commentsHandler = createCommentsHandler(commentsService);
+
+  // Public routes
+  fastify.get(
+    "/:id/comments",
+    { schema: listCommentsSchema },
+    commentsHandler.listCommentsHandler,
+  );
 
   // Public routes (with optional auth for like/bookmark status)
   fastify.route({
@@ -76,6 +99,11 @@ const postsRoutes: FastifyPluginAsync = async (fastify) => {
       handler.deletePostHandler,
     );
 
+    scope.post(
+      "/:id/comments",
+      { schema: createCommentSchema },
+      commentsHandler.createCommentHandler,
+    );
     scope.post(
       "/:id/like",
       { schema: toggleLikeSchema },
