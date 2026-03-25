@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { api, ApiError } from "@/lib/api";
 import { getInitials } from "@/lib/format";
@@ -14,13 +14,25 @@ import type { UserResponseDto } from "@repo/shared-types";
 import { Camera } from "lucide-react";
 
 export default function ProfilePage() {
-  const { user, setUser } = useAuth();
+  const { user, isLoading, setUser } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [bio, setBio] = useState(user?.bio ?? "");
-  const [website, setWebsite] = useState(user?.website ?? "");
-  const [slug, setSlug] = useState(user?.slug ?? "");
+  const [bio, setBio] = useState("");
+  const [website, setWebsite] = useState("");
+  const [slug, setSlug] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setBio(user.bio ?? "");
+      setWebsite(user.website ?? "");
+      setSlug(user.slug ?? "");
+    }
+  }, [user]);
+
+  if (isLoading) {
+    return <div className="h-64 animate-pulse rounded-lg bg-muted" />;
+  }
 
   if (!user) return null;
 
