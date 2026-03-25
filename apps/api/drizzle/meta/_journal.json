@@ -43,6 +43,13 @@
       "when": 1774377428498,
       "tag": "0005_wonderful_fantastic_four",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1774446461260,
+      "tag": "0006_yellow_namorita",
+      "breakpoints": true
     }
   ]
 }

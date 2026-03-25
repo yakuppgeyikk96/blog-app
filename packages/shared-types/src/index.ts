@@ -14,3 +14,8 @@ export type {
   UpdatePostInput,
 } from "./post.js";
 export type { TagDto } from "./tag.js";
+export type {
+  CommentDto,
+  CommentWithRepliesDto,
+  CreateCommentInput,
+} from "./comment.js";
