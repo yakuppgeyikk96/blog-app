@@ -20,6 +20,7 @@ export interface PostResponseDto {
   liked: boolean;
   bookmarked: boolean;
   commentCount: number;
+  viewCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,6 +43,7 @@ export interface PostListItemDto {
   liked: boolean;
   bookmarked: boolean;
   commentCount: number;
+  viewCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
