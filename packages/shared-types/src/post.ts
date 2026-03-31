@@ -6,6 +6,7 @@ export interface PostResponseDto {
   slug: string;
   summary: string | null;
   content: string;
+  contentJson: string | null;
   coverImage: string | null;
   published: boolean;
   author: {
@@ -56,6 +57,7 @@ export interface CreatePostInput {
 export interface UpdatePostInput {
   title?: string;
   content?: string;
+  contentJson?: string;
   summary?: string | null;
   coverImage?: string | null;
   published?: boolean;

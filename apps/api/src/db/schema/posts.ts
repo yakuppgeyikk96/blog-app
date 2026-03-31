@@ -22,6 +22,7 @@ export const posts = pgTable("posts", {
   slug: text("slug").notNull().unique(),
   summary: text("summary"),
   content: text("content").notNull(),
+  contentJson: text("content_json"),
   coverImage: text("cover_image"),
   published: boolean("published").notNull().default(false),
   authorId: uuid("author_id")

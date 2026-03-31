@@ -27,6 +27,7 @@ export function toPostResponseDto(
     slug: post.slug,
     summary: post.summary,
     content: post.content,
+    contentJson: post.contentJson,
     coverImage: post.coverImage,
     published: post.published,
     author: {

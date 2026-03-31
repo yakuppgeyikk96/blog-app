@@ -50,6 +50,13 @@
       "when": 1774446461260,
       "tag": "0006_yellow_namorita",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1774958290386,
+      "tag": "0007_adorable_wolverine",
+      "breakpoints": true
     }
   ]
 }

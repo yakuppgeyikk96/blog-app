@@ -14,7 +14,10 @@ export function PostCard({ post }: PostCardProps) {
   return (
     <article className="group overflow-hidden rounded-lg border bg-card transition-colors hover:border-foreground/20">
       {post.coverImage && (
-        <Link href={`/posts/${post.slug}`} className="relative block overflow-hidden">
+        <Link
+          href={`/posts/${post.slug}`}
+          className="relative block overflow-hidden"
+        >
           <BlurImage
             src={post.coverImage}
             alt={post.title}

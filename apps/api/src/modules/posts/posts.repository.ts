@@ -30,6 +30,7 @@ export function createPostsRepository(db: DbType) {
     slug: posts.slug,
     summary: posts.summary,
     content: posts.content,
+    contentJson: posts.contentJson,
     coverImage: posts.coverImage,
     published: posts.published,
     authorId: posts.authorId,

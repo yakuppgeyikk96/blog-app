@@ -19,6 +19,7 @@ const PostResponseSchema = Type.Object({
   slug: Type.String(),
   summary: Type.Union([Type.String(), Type.Null()]),
   content: Type.String(),
+  contentJson: Type.Union([Type.String(), Type.Null()]),
   coverImage: Type.Union([Type.String(), Type.Null()]),
   published: Type.Boolean(),
   author: AuthorSchema,
@@ -66,6 +67,7 @@ const CreatePostBody = Type.Object({
 const UpdatePostBody = Type.Object({
   title: Type.Optional(Type.String({ minLength: 1, maxLength: 200 })),
   content: Type.Optional(Type.String({ minLength: 1 })),
+  contentJson: Type.Optional(Type.String()),
   summary: Type.Optional(
     Type.Union([Type.String({ maxLength: 500 }), Type.Null()]),
   ),

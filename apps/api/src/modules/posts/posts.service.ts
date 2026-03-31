@@ -265,6 +265,9 @@ export function createPostsService({
       if (input.content !== undefined) {
         updateData.content = sanitizeContent(input.content);
       }
+      if (input.contentJson !== undefined) {
+        updateData.contentJson = input.contentJson;
+      }
       if (input.summary !== undefined) {
         updateData.summary = input.summary;
       }

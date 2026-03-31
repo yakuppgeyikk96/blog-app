@@ -74,7 +74,10 @@ export function PostEditor({ postId }: PostEditorProps) {
 
   const debouncedSaveContent = useDebouncedCallback(
     (editor: EditorInstance) => {
-      save({ content: editor.getHTML() });
+      save({
+        content: editor.getHTML(),
+        contentJson: JSON.stringify(editor.getJSON()),
+      });
     },
     1500,
   );
@@ -111,7 +114,7 @@ export function PostEditor({ postId }: PostEditorProps) {
     );
   }
 
-  const initialContent = htmlToInitialContent(post.content);
+  const initialContent = getInitialContent(post);
 
   return (
     <div className="mx-auto max-w-3xl py-8">
@@ -181,7 +184,7 @@ export function PostEditor({ postId }: PostEditorProps) {
             }}
           >
             <BubbleMenu />
-            <EditorCommand className="z-50 h-auto max-h-[330px] w-72 overflow-y-auto rounded-md border border-muted bg-background px-1 py-2 shadow-md transition-all">
+            <EditorCommand className="z-50 h-auto max-h-82.5 w-72 overflow-y-auto rounded-md border border-muted bg-background px-1 py-2 shadow-md transition-all">
               <EditorCommandEmpty className="px-2 text-muted-foreground">
                 No results
               </EditorCommandEmpty>
@@ -222,7 +225,9 @@ export function PostEditor({ postId }: PostEditorProps) {
         initialSummary={post.summary}
         initialCoverImage={post.coverImage}
         initialTags={post.tags.map((t) => t.name)}
-        onPublished={() => setPost((prev) => prev ? { ...prev, published: true } : prev)}
+        onPublished={() =>
+          setPost((prev) => (prev ? { ...prev, published: true } : prev))
+        }
       />
     </div>
   );
@@ -266,11 +271,17 @@ function SaveStatusIndicator({ status }: { status: SaveStatus }) {
   );
 }
 
-function htmlToInitialContent(html: string): JSONContent | undefined {
-  if (!html || html === "<p></p>") return undefined;
+function getInitialContent(post: PostResponseDto): JSONContent | undefined {
+  // Prefer JSON (preserves all node types like HTML blocks)
+  if (post.contentJson) {
+    try {
+      return JSON.parse(post.contentJson) as JSONContent;
+    } catch {
+      // Fall through to HTML
+    }
+  }
 
-  // Tiptap's EditorProvider accepts HTML strings as content,
-  // but Novel's TypeScript types restrict initialContent to JSONContent.
-  // The underlying tiptap core handles the conversion internally.
-  return html as unknown as JSONContent;
+  // Fallback to HTML for older posts without JSON
+  if (!post.content || post.content === "<p></p>") return undefined;
+  return post.content as unknown as JSONContent;
 }
