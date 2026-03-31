@@ -30,3 +30,12 @@ export const toggleBookmarkSchema = {
   params: PostIdParams,
   response: { 200: ToggleBookmarkResponse },
 };
+
+const RecordViewResponse = Type.Object({
+  success: Type.Literal(true),
+});
+
+export const recordViewSchema = {
+  params: PostIdParams,
+  response: { 200: RecordViewResponse },
+};

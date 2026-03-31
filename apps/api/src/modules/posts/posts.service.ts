@@ -44,12 +44,13 @@ export function createPostsService({
   }
 
   async function getInteractionData(postId: string, userId?: string) {
-    const [likeCounts, userInteractions, commentCounts] = await Promise.all([
+    const [likeCounts, userInteractions, commentCounts, viewCounts] = await Promise.all([
       interactionsService.getLikeCounts([postId]),
       userId
         ? interactionsService.getUserInteractions(userId, [postId])
         : Promise.resolve(new Map()),
       commentsService.getCommentCounts([postId]),
+      interactionsService.getViewCounts([postId]),
     ]);
 
     const interaction = userInteractions.get(postId);
@@ -58,6 +59,7 @@ export function createPostsService({
       liked: interaction?.liked ?? false,
       bookmarked: interaction?.bookmarked ?? false,
       commentCount: commentCounts.get(postId) ?? 0,
+      viewCount: viewCounts.get(postId) ?? 0,
     };
   }
 
@@ -74,13 +76,14 @@ export function createPostsService({
     const { items, total } = await fetchFn({ offset, limit: clampedLimit });
 
     const postIds = items.map((p) => p.id);
-    const [tagMap, likeCounts, userInteractions, commentCounts] = await Promise.all([
+    const [tagMap, likeCounts, userInteractions, commentCounts, viewCounts] = await Promise.all([
       tagsService.getTagsForPosts(postIds),
       interactionsService.getLikeCounts(postIds),
       userId
         ? interactionsService.getUserInteractions(userId, postIds)
         : Promise.resolve(new Map<string, { liked: boolean; bookmarked: boolean }>()),
       commentsService.getCommentCounts(postIds),
+      interactionsService.getViewCounts(postIds),
     ]);
 
     return {
@@ -91,6 +94,7 @@ export function createPostsService({
           liked: interaction?.liked ?? false,
           bookmarked: interaction?.bookmarked ?? false,
           commentCount: commentCounts.get(item.id) ?? 0,
+          viewCount: viewCounts.get(item.id) ?? 0,
         });
       }),
       pagination: {
@@ -196,6 +200,37 @@ export function createPostsService({
       );
     },
 
+    async listPopular(
+      limit = 5,
+      userId?: string,
+    ): Promise<PostListItemDto[]> {
+      const postIds = await interactionsService.getPopularPostIds(limit);
+      if (postIds.length === 0) return [];
+
+      const items = await postsRepository.findByIds(postIds);
+
+      const [tagMap, likeCounts, userInteractions, commentCounts, viewCounts] = await Promise.all([
+        tagsService.getTagsForPosts(postIds),
+        interactionsService.getLikeCounts(postIds),
+        userId
+          ? interactionsService.getUserInteractions(userId, postIds)
+          : Promise.resolve(new Map<string, { liked: boolean; bookmarked: boolean }>()),
+        commentsService.getCommentCounts(postIds),
+        interactionsService.getViewCounts(postIds),
+      ]);
+
+      return items.map((item) => {
+        const interaction = userInteractions.get(item.id);
+        return toPostListItemDto(item, tagMap.get(item.id) ?? [], {
+          likeCount: likeCounts.get(item.id) ?? 0,
+          liked: interaction?.liked ?? false,
+          bookmarked: interaction?.bookmarked ?? false,
+          commentCount: commentCounts.get(item.id) ?? 0,
+          viewCount: viewCounts.get(item.id) ?? 0,
+        });
+      });
+    },
+
     async listBookmarked(
       userId: string,
       page: number,
@@ -213,11 +248,12 @@ export function createPostsService({
 
       const items = await postsRepository.findByIds(postIds);
 
-      const [tagMap, likeCounts, userInteractions, commentCounts] = await Promise.all([
+      const [tagMap, likeCounts, userInteractions, commentCounts, viewCounts] = await Promise.all([
         tagsService.getTagsForPosts(postIds),
         interactionsService.getLikeCounts(postIds),
         interactionsService.getUserInteractions(userId, postIds),
         commentsService.getCommentCounts(postIds),
+        interactionsService.getViewCounts(postIds),
       ]);
 
       return {
@@ -228,6 +264,7 @@ export function createPostsService({
             liked: interaction?.liked ?? false,
             bookmarked: interaction?.bookmarked ?? false,
             commentCount: commentCounts.get(item.id) ?? 0,
+            viewCount: viewCounts.get(item.id) ?? 0,
           });
         }),
         pagination: {

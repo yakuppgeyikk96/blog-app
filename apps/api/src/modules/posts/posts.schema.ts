@@ -28,6 +28,7 @@ const PostResponseSchema = Type.Object({
   liked: Type.Boolean(),
   bookmarked: Type.Boolean(),
   commentCount: Type.Integer(),
+  viewCount: Type.Integer(),
   createdAt: Type.String({ format: "date-time" }),
   updatedAt: Type.String({ format: "date-time" }),
 });
@@ -45,6 +46,7 @@ const PostListItemSchema = Type.Object({
   liked: Type.Boolean(),
   bookmarked: Type.Boolean(),
   commentCount: Type.Integer(),
+  viewCount: Type.Integer(),
   createdAt: Type.String({ format: "date-time" }),
   updatedAt: Type.String({ format: "date-time" }),
 });
@@ -109,6 +111,17 @@ const SuccessPostListResponse = Type.Object({
   }),
 });
 
+const PopularPostsQuerystring = Type.Object({
+  limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 20, default: 5 })),
+});
+
+const SuccessPopularPostsResponse = Type.Object({
+  success: Type.Literal(true),
+  data: Type.Object({
+    items: Type.Array(PostListItemSchema),
+  }),
+});
+
 const SuccessDeleteResponse = Type.Object({
   success: Type.Literal(true),
 });
@@ -132,6 +145,11 @@ export const getPostSchema = {
 export const listPostsSchema = {
   querystring: ListPostsQuerystring,
   response: { 200: SuccessPostListResponse },
+};
+
+export const popularPostsSchema = {
+  querystring: PopularPostsQuerystring,
+  response: { 200: SuccessPopularPostsResponse },
 };
 
 export const updatePostSchema = {

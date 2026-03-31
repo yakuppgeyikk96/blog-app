@@ -1,4 +1,10 @@
+import { createHash } from "node:crypto";
 import type { InteractionsRepository } from "./interactions.repository";
+
+function hashViewerIp(ip: string): string {
+  const today = new Date().toISOString().split("T")[0];
+  return createHash("sha256").update(`${ip}:${today}`).digest("hex");
+}
 
 interface InteractionsServiceDeps {
   interactionsRepository: InteractionsRepository;
@@ -47,6 +53,19 @@ export function createInteractionsService({
       limit: number,
     ): Promise<{ postIds: string[]; total: number }> {
       return interactionsRepository.getBookmarkedPostIds(userId, offset, limit);
+    },
+
+    async recordView(postId: string, ip: string): Promise<void> {
+      const viewerHash = hashViewerIp(ip);
+      await interactionsRepository.recordView(postId, viewerHash);
+    },
+
+    async getViewCounts(postIds: string[]): Promise<Map<string, number>> {
+      return interactionsRepository.getViewCounts(postIds);
+    },
+
+    async getPopularPostIds(limit: number, days = 7): Promise<string[]> {
+      return interactionsRepository.getPopularPostIds(limit, days);
     },
   };
 }

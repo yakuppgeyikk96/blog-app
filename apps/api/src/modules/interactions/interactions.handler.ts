@@ -29,5 +29,15 @@ export function createInteractionsHandler(
 
       return reply.status(200).send({ success: true, data: result });
     },
+
+    async recordViewHandler(
+      request: FastifyRequest<{ Params: PostIdParamsType }>,
+      reply: FastifyReply,
+    ) {
+      const ip = request.headers["x-forwarded-for"] as string ?? request.ip;
+      await interactionsService.recordView(request.params.id, ip);
+
+      return reply.status(200).send({ success: true });
+    },
   };
 }

@@ -43,6 +43,16 @@ export function createPostsHandler(postsService: PostsService) {
       return reply.status(200).send({ success: true, data: { post } });
     },
 
+    async popularPostsHandler(
+      request: FastifyRequest<{ Querystring: { limit?: number } }>,
+      reply: FastifyReply,
+    ) {
+      const limit = Math.min(request.query.limit ?? 5, 20);
+      const items = await postsService.listPopular(limit, request.user?.id);
+
+      return reply.status(200).send({ success: true, data: { items } });
+    },
+
     async listPostsHandler(
       request: FastifyRequest<{ Querystring: ListPostsQuerystringType }>,
       reply: FastifyReply,

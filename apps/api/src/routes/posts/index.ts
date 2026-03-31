@@ -7,6 +7,7 @@ import {
   getPostSchema,
   getPostBySlugSchema,
   listPostsSchema,
+  popularPostsSchema,
   updatePostSchema,
   deletePostSchema,
 } from "../../modules/posts/posts.schema.js";
@@ -18,6 +19,7 @@ import { createInteractionsHandler } from "../../modules/interactions/interactio
 import {
   toggleLikeSchema,
   toggleBookmarkSchema,
+  recordViewSchema,
 } from "../../modules/interactions/interactions.schema.js";
 import { createCommentsRepository } from "../../modules/comments/comments.repository.js";
 import { createCommentsService } from "../../modules/comments/comments.service.js";
@@ -61,6 +63,19 @@ const postsRoutes: FastifyPluginAsync = async (fastify) => {
     { schema: listCommentsSchema },
     commentsHandler.listCommentsHandler,
   );
+  fastify.post(
+    "/:id/view",
+    { schema: recordViewSchema },
+    interactionsHandler.recordViewHandler,
+  );
+
+  fastify.route({
+    method: "GET",
+    url: "/popular",
+    schema: popularPostsSchema,
+    onRequest: [fastify.optionalAuthenticate],
+    handler: handler.popularPostsHandler,
+  });
 
   // Public routes (with optional auth for like/bookmark status)
   fastify.route({

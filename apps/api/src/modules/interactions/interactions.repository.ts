@@ -1,6 +1,6 @@
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import type { DbType } from "../../db/connection";
-import { postLikes, postBookmarks } from "../../db/schema/index";
+import { postLikes, postBookmarks, postViews } from "../../db/schema/index";
 
 export function createInteractionsRepository(db: DbType) {
   return {
@@ -132,6 +132,52 @@ export function createInteractionsRepository(db: DbType) {
         postIds: rows.map((r) => r.postId),
         total: countResult?.total ?? 0,
       };
+    },
+
+    async recordView(
+      postId: string,
+      viewerHash: string,
+    ): Promise<void> {
+      await db
+        .insert(postViews)
+        .values({ postId, viewerHash })
+        .onConflictDoNothing();
+    },
+
+    async getViewCounts(
+      postIds: string[],
+    ): Promise<Map<string, number>> {
+      if (postIds.length === 0) return new Map();
+
+      const rows = await db
+        .select({ postId: postViews.postId, total: count() })
+        .from(postViews)
+        .where(inArray(postViews.postId, postIds))
+        .groupBy(postViews.postId);
+
+      const map = new Map<string, number>();
+      for (const row of rows) {
+        map.set(row.postId, row.total);
+      }
+      return map;
+    },
+
+    async getPopularPostIds(
+      limit: number,
+      days: number,
+    ): Promise<string[]> {
+      const since = new Date();
+      since.setDate(since.getDate() - days);
+
+      const rows = await db
+        .select({ postId: postViews.postId, total: count() })
+        .from(postViews)
+        .where(gte(postViews.viewedAt, since))
+        .groupBy(postViews.postId)
+        .orderBy(desc(count()))
+        .limit(limit);
+
+      return rows.map((r) => r.postId);
     },
   };
 }
