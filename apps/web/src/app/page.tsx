@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { X } from "lucide-react";
+import { Eye, TrendingUp, X } from "lucide-react";
 import { PostCard } from "@/components/post-card";
 import { Badge } from "@/components/ui/badge";
 import { SearchInput } from "@/components/search-input";
-import { fetchPublishedPosts } from "./actions";
+import { fetchPublishedPosts, fetchPopularPosts } from "./actions";
 
 interface HomeProps {
   searchParams: Promise<{ page?: string; tag?: string; q?: string }>;
@@ -15,10 +15,17 @@ export default async function Home({ searchParams }: HomeProps) {
 
   let data: Awaited<ReturnType<typeof fetchPublishedPosts>>["data"] | null =
     null;
+  let popularPosts: Awaited<ReturnType<typeof fetchPopularPosts>>["data"]["items"] = [];
 
   try {
-    const response = await fetchPublishedPosts(page, 12, tag, q);
-    data = response.data;
+    const [postsResponse, popularResponse] = await Promise.all([
+      fetchPublishedPosts(page, 12, tag, q),
+      page === 1 && !tag && !q ? fetchPopularPosts(5) : Promise.resolve(null),
+    ]);
+    data = postsResponse.data;
+    if (popularResponse) {
+      popularPosts = popularResponse.data.items;
+    }
   } catch {
     // Graceful fallback — show empty state on API failure
   }
@@ -58,6 +65,38 @@ export default async function Home({ searchParams }: HomeProps) {
             </Link>
           </Badge>
         </div>
+      )}
+
+      {popularPosts.length > 0 && (
+        <section>
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
+            <TrendingUp className="size-5" />
+            Trending This Week
+          </h2>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {popularPosts.map((post, i) => (
+              <Link
+                key={post.id}
+                href={`/posts/${post.slug}`}
+                className="flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-accent"
+              >
+                <span className="text-2xl font-bold text-muted-foreground/50">
+                  {i + 1}
+                </span>
+                <div className="min-w-0">
+                  <p className="line-clamp-2 text-sm font-medium">{post.title}</p>
+                  <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>{post.author.name}</span>
+                    <span className="flex items-center gap-0.5">
+                      <Eye className="size-3" />
+                      {post.viewCount}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
 
       {items.length > 0 ? (

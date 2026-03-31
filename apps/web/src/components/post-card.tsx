@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MessageSquare } from "lucide-react";
+import { Eye, MessageSquare } from "lucide-react";
 import type { PostListItemDto } from "@repo/shared-types";
 import { formatDate } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
@@ -45,32 +45,38 @@ export function PostCard({ post }: PostCardProps) {
             ))}
           </div>
         )}
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Link
-              href={`/authors/${post.author.slug}`}
-              className="hover:underline"
-            >
-              {post.author.name}
-            </Link>
-            <span>&middot;</span>
-            <span>{formatDate(post.createdAt)}</span>
-          </div>
-          <div className="flex items-center gap-3">
+
+        <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+          <Link
+            href={`/authors/${post.author.slug}`}
+            className="hover:underline"
+          >
+            {post.author.name}
+          </Link>
+          <span>&middot;</span>
+          <span>{formatDate(post.createdAt)}</span>
+        </div>
+
+        <div className="mt-2 flex items-center justify-between border-t pt-2">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Eye className="size-3.5" />
+              {post.viewCount}
+            </span>
             <Link
               href={`/posts/${post.slug}#comments`}
-              className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
+              className="flex items-center gap-1 hover:text-foreground"
             >
               <MessageSquare className="size-3.5" />
-              <span className="text-xs">{post.commentCount}</span>
+              {post.commentCount}
             </Link>
-            <InteractionButtons
-              postId={post.id}
-              likeCount={post.likeCount}
-              liked={post.liked}
-              bookmarked={post.bookmarked}
-            />
           </div>
+          <InteractionButtons
+            postId={post.id}
+            likeCount={post.likeCount}
+            liked={post.liked}
+            bookmarked={post.bookmarked}
+          />
         </div>
       </div>
     </article>

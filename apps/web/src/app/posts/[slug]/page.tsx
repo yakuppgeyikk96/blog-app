@@ -5,7 +5,9 @@ import { fetchPostBySlug } from "@/app/actions";
 import { formatDate } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { BlurImage } from "@/components/blur-image";
+import { Eye } from "lucide-react";
 import { InteractionButtons } from "@/components/interaction-buttons";
+import { ViewTracker } from "@/components/view-tracker";
 import { CommentSection } from "@/components/comments/comment-section";
 
 export const revalidate = 3600;
@@ -69,6 +71,11 @@ export default async function PostPage({ params }: PostPageProps) {
             <time dateTime={String(post.createdAt)}>
               {formatDate(post.createdAt)}
             </time>
+            <span>&middot;</span>
+            <span className="flex items-center gap-1">
+              <Eye className="size-3.5" />
+              {post.viewCount}
+            </span>
           </div>
           <InteractionButtons
             postId={post.id}
@@ -95,6 +102,7 @@ export default async function PostPage({ params }: PostPageProps) {
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
 
+      <ViewTracker postId={post.id} />
       <CommentSection postId={post.id} postAuthorId={post.author.id} />
     </article>
   );

@@ -29,3 +29,9 @@ export async function fetchPostBySlug(slug: string) {
     `/posts/by-slug/${slug}`,
   );
 }
+
+export async function fetchPopularPosts(limit = 5) {
+  return serverApi<ApiResponse<{ items: PostListItemDto[] }>>(
+    `/posts/popular?limit=${limit}`,
+  );
+}
