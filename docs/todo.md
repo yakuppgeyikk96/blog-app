@@ -8,7 +8,7 @@
 ## User Experience
 
 - [x] Rich text editor (Tiptap — slash komutları, bubble menu, HTML block)
-- [ ] Social sharing butonları (Twitter/LinkedIn/Copy link)
+- [x] Social sharing butonları (Twitter/X, LinkedIn, Copy link)
 - [ ] Infinite scroll (pagination yerine)
 
 ## SEO & Discovery
@@ -19,5 +19,5 @@
 
 ## Analytics & Engagement
 
-- [ ] Görüntülenme sayısı (post view count, popüler postlar)
+- [x] Görüntülenme sayısı (IP hash, daily unique, trending section)
 - [ ] Bildirimler (like/yorum bildirimleri, in-app)

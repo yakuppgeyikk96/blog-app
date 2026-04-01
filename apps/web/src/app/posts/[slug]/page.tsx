@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { BlurImage } from "@/components/blur-image";
 import { Eye } from "lucide-react";
 import { InteractionButtons } from "@/components/interaction-buttons";
+import { ShareButtons } from "@/components/share-buttons";
 import { ViewTracker } from "@/components/view-tracker";
 import { CommentSection } from "@/components/comments/comment-section";
 
@@ -101,6 +102,11 @@ export default async function PostPage({ params }: PostPageProps) {
         className="prose prose-neutral dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
+
+      <div className="mt-8 flex items-center justify-between border-t pt-6">
+        <span className="text-sm text-muted-foreground">Share this post</span>
+        <ShareButtons title={post.title} slug={post.slug} />
+      </div>
 
       <ViewTracker postId={post.id} />
       <CommentSection postId={post.id} postAuthorId={post.author.id} />
