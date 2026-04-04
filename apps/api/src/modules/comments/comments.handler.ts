@@ -7,7 +7,19 @@ import type {
   UpdateCommentBodyType,
 } from "./comments.schema";
 
-export function createCommentsHandler(commentsService: CommentsService) {
+interface CommentsHandlerDeps {
+  commentsService: CommentsService;
+  onComment?: (
+    userId: string,
+    postId: string,
+    parentId: string | undefined,
+  ) => Promise<void>;
+}
+
+export function createCommentsHandler({
+  commentsService,
+  onComment,
+}: CommentsHandlerDeps) {
   return {
     async listCommentsHandler(
       request: FastifyRequest<{ Params: PostIdParamsType }>,
@@ -30,6 +42,14 @@ export function createCommentsHandler(commentsService: CommentsService) {
         request.user!.id,
         request.body,
       );
+
+      if (onComment) {
+        onComment(
+          request.user!.id,
+          request.params.id,
+          request.body.parentId,
+        ).catch(() => {});
+      }
 
       return reply.status(201).send({ success: true, data: { comment } });
     },

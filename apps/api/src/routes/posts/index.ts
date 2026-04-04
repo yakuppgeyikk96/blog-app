@@ -28,6 +28,8 @@ import {
   listCommentsSchema,
   createCommentSchema,
 } from "../../modules/comments/comments.schema.js";
+import { createNotificationsRepository } from "../../modules/notifications/notifications.repository.js";
+import { createNotificationsService } from "../../modules/notifications/notifications.service.js";
 
 const postsRoutes: FastifyPluginAsync = async (fastify) => {
   const postsRepository = createPostsRepository(fastify.db);
@@ -53,9 +55,54 @@ const postsRoutes: FastifyPluginAsync = async (fastify) => {
     httpErrors: fastify.httpErrors,
   });
 
+  const notificationsRepository = createNotificationsRepository(fastify.db);
+  const notificationsService = createNotificationsService({
+    notificationsRepository,
+  });
+
   const handler = createPostsHandler(postsService);
-  const interactionsHandler = createInteractionsHandler(interactionsService);
-  const commentsHandler = createCommentsHandler(commentsService);
+  const interactionsHandler = createInteractionsHandler({
+    interactionsService,
+    async onLike(userId, postId) {
+      const post = await postsRepository.findById(postId);
+      if (!post) return;
+      await notificationsService.notify({
+        recipientId: post.authorId,
+        actorId: userId,
+        type: "post_liked",
+        postId,
+      });
+    },
+  });
+  const commentsHandler = createCommentsHandler({
+    commentsService,
+    async onComment(userId, postId, parentId) {
+      const post = await postsRepository.findById(postId);
+      if (!post) return;
+
+      if (parentId) {
+        // Reply — notify the parent comment author
+        const parent = await commentsRepository.findById(parentId);
+        if (parent) {
+          await notificationsService.notify({
+            recipientId: parent.authorId,
+            actorId: userId,
+            type: "comment_replied",
+            postId,
+            commentId: parentId,
+          });
+        }
+      } else {
+        // Top-level comment — notify the post author
+        await notificationsService.notify({
+          recipientId: post.authorId,
+          actorId: userId,
+          type: "post_commented",
+          postId,
+        });
+      }
+    },
+  });
 
   // Public routes
   fastify.get(

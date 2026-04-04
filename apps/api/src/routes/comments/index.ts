@@ -17,7 +17,7 @@ const commentsRoutes: FastifyPluginAsync = async (fastify) => {
     httpErrors: fastify.httpErrors,
   });
 
-  const handler = createCommentsHandler(commentsService);
+  const handler = createCommentsHandler({ commentsService });
 
   fastify.register(async (scope) => {
     scope.addHook("onRequest", fastify.authenticate);
