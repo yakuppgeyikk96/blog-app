@@ -64,6 +64,13 @@
       "when": 1774986672191,
       "tag": "0008_mysterious_nicolaos",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1775297750839,
+      "tag": "0009_ambitious_shadow_king",
+      "breakpoints": true
     }
   ]
 }

@@ -19,3 +19,7 @@ export type {
   CommentWithRepliesDto,
   CreateCommentInput,
 } from "./comment.js";
+export type {
+  NotificationType,
+  NotificationDto,
+} from "./notification.js";

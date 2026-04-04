@@ -4,3 +4,4 @@ export { tags, postTags } from "./tags";
 export { postLikes, postBookmarks } from "./interactions";
 export { comments } from "./comments";
 export { postViews } from "./views";
+export { notifications } from "./notifications";
