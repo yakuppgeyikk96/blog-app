@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { HeaderNav } from "@/components/layout/header-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 export function Header() {
   return (
@@ -13,6 +14,7 @@ export function Header() {
 
         <nav className="flex items-center gap-2">
           <ThemeToggle />
+          <NotificationBell />
           <HeaderNav />
         </nav>
       </div>
