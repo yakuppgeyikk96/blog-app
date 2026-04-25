@@ -23,7 +23,7 @@ export function AuthModal({ open, onOpenChange, defaultTab = "login" }: AuthModa
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Welcome to BlogApp</DialogTitle>
+          <DialogTitle>Welcome to Papyra</DialogTitle>
         </DialogHeader>
         <Tabs defaultValue={defaultTab}>
           <TabsList className="w-full">

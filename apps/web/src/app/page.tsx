@@ -46,7 +46,7 @@ export default async function Home({ searchParams }: HomeProps) {
     <div className="space-y-10">
       <section className="text-center">
         <h1 className="text-4xl font-bold tracking-tight">
-          Welcome to BlogApp
+          Welcome to Papyra
         </h1>
         <p className="mt-2 text-lg text-muted-foreground">
           Discover stories, ideas, and insights.

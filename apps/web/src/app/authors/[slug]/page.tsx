@@ -20,7 +20,7 @@ export async function generateMetadata({
   try {
     const { data } = await fetchAuthorProfile(slug);
     return {
-      title: `${data.author.name} — BlogApp`,
+      title: `${data.author.name} — Papyra`,
       description: data.author.bio ?? undefined,
     };
   } catch {
